@@ -1,0 +1,26 @@
+
+LIB-FI Library Profiler
+
+Purpose: take a binary library and extract information regarding exported
+functions and possible retrun values for each function.
+
+Usage:
+make
+./dasmfn.sh <path to library>
+./listfn.sh <path to library>
+
+Special case: profiling linux system calls
+make
+./dasmfn.sh <path to debug-vmlinux-kernel>
+./syscalls.sh <path to /arch/i386/kernel/syscall_table.S>
+
+Note:
+The debug kernel can be downloaded in /boot with apt-get install linux-image-debug-... (apt-cache search kernel debug image)
+or a similar command depending on distribution 
+The syscall_table.S is usually at /usr/src/linux-source/arch/i386/kernel/syscall_table.S
+
+
+1. Disassembly for each function is created in the disassembly subfolder via objdump
+2. The profiler manager (build using make above) is run on each disassembly file to generate
+the actual results in the profiles folder. It invokes the profiler for the actual file and then
+for all the relevant dependencies

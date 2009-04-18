@@ -1,0 +1,23 @@
+
+LFI Injection Controller
+
+Purpose: start a program with fault injection according to an injection plan
+specified by the provided configuration file
+
+USAGE:
+make
+./libfi <configuration file> [-r injection_probability] -m <target module> -t <subject executable>
+
+
+Example:
+./libfi sampleplan.xml -m ls -t "/bin/ls"
+
+NOTE:
+1. The injection probability should be a number between 1 and 1000. The presence of the -r argument
+also informs the injector about the structure of the configuration file: configuration files produced
+by the profiler should always be used with the -r switch; replay files produces by the injector
+should always be used without the -r switch.
+
+2. The -m argument informs the injector about the module (can be either the main executable or a specific
+shared module) where faults are to be injected. A fault will be injected in a call, only if the call is made
+from this module.

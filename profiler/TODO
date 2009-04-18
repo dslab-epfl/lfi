@@ -1,0 +1,47 @@
+
+LIB-FI Library Profiler
+
+-include errno information
+
+-mark a location as `dirty` if appropriate to avoid false positives
+i.e.
+mov eax, 0x1234
+or eax, ebx
+ret
+
+current behavior - or eax, ebx is ignored, 0x1234 is reported as a possible return value
+
+-add some `simulation` to the mix.
+e.g.
+mov eax, 0x0
+add eax, 0x1
+ret
+
+Reported possible return values: 0x0 (or none afer implementing the above `dirty` mark).
+Problem: the return value is build by using two instuctions
+Solution: keep a stack of operations to apply to the constant value found (we're going bottom-up)
+
+-break some complex instructions in more simple instruction
+e.g. (idea from ecb_crypt)
+mov edx, 0x2
+...
+cmp something, something_else
+sete dl
+....
+mov eax, edx
+ret
+
+The possible return values in this case are 1 and 2. (sete = set if equal)
+This could be handled by
+1. transforming the sete in jne+mov, in the end generating a new BB and
+2. implementing the `simulation` (above)
+
+More instructions can be handled this way (e.g. cmovxx family)
+
+
+
+-save information in the format expected by the injector [done]
+
+-generate more accurate disassembly. Currently the function boundaries can be inaccurate.
+The entry point is always known but the last instruction is not easy to determine. The
+current approach: disassemble until the next exported symbol is encountered [done]

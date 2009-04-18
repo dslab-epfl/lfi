@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan>
+
+<function name="readdir64" inject="5" retval="0" errno="EBADF" calloriginal="1" />
+<function name="readdir" inject="5" retval="0" errno="EBADF" calloriginal="1" />
+
+</plan>
