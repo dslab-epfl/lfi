@@ -23,6 +23,7 @@
      1015 Lausanne
      Switzerland
 */
+#include <stdio.h>
 #include <string.h>
 #include "inter.h"
 
@@ -312,7 +313,7 @@ int find_range()
 			if (strstr(line, "r-xp") && strstr(line, TARGET_EXE))
 			{
 				printf("injecting in: %s\n", line);
-				sscanf(line, "%x-%x", &exe_start, &exe_end);
+				sscanf(line, "%p-%p", &exe_start, &exe_end);
 				
 				break;
 			}

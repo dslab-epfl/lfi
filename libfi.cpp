@@ -27,26 +27,28 @@
 #include <iostream>
 #include <fstream>
 #include <set>
-#include <string>
+#include <string.h>
 #include <assert.h>
 
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
-#include <unistd.h>
+
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <sys/shm.h>
 #include <sys/time.h>
-#include <time.h>
+#include <sys/wait.h>
+
+#include <errno.h>
 #include <fcntl.h>
+#include <time.h>
 #include <unistd.h>
 
 using namespace std;
 
-#define STUBC	"intercept.stub.c"
-#define STUBEX	"intercept.stub.so"
+#define STUBC	((char *) "intercept.stub.c")
+#define STUBEX	((char *) "intercept.stub.so")
 
 #define LOGFILE		"inject.log"
 #define	REPLAYFILE	"replay.xml"
@@ -61,7 +63,7 @@ using namespace std;
 void usage(char* me)
 {
     cout << "Usage: ";
-    cout << me << " <configuration file> [-r injection_probability] [-f path_to_file_to_create_if_crash] -m <target module> -t <subject executable>" << endl;
+    cout << me << " <configFile> -t <targetExecutable> [-m <targetModule>] [-r <injectionProb>] [-f <crashFile>]" << endl;
 }
 
 /************************************************************************/
@@ -75,9 +77,8 @@ void print_xpath_nodesv2(xmlNodeSetPtr nodes, ofstream& out)
 {
 	xmlNodePtr cur;
 	xmlChar* functionName, *call_count, *return_value, *errno_value, *call_original;
-	xmlChar* nodeValue;
 	int size;
-	int i, error_count, fn_count;
+	int i, fn_count;
 
 	size = (nodes) ? nodes->nodeNr : 0;
 	fn_count = 0;
@@ -151,11 +152,8 @@ void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
 {
 	xmlNodePtr cur;
 	xmlChar* functionName, *functionName2, *call_count, *return_value, *errno_value, *call_original;
-	xmlChar* nodeValue;
-	xmlChar* returnValue;
 	int size;
-	int i, j, error_count, fn_count, total_errors = 0;
-	const int triggers_per_fn = 10;
+	int i, j, fn_count;
 	set<string> functionsUsed;
 
 	size = (nodes) ? nodes->nodeNr : 0;
@@ -454,10 +452,12 @@ int compile_file(char* cfile, char* outfile)
 	{
 		cerr << "compiled successfully..." << endl;
 	}
+	sprintf( cmd, "rm -f %s.* inter.c.*", cfile );
+	system( cmd );
     return 0;
 }
 
-int generate_stub(char* config, int random_injection, char* inject_probability, char* module_target)
+int generate_stub(char* config, bool random_injection, char* inject_probability, char* module_target)
 {
     xmlDocPtr doc;
     xmlXPathContextPtr xpathCtx;
@@ -646,15 +646,16 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 
 int main(int argc, char* argv[], char* envp[])
 {
-    char *config, *crash_create, *run_target, *module_target, *inject_probability, *token;
+        char *crash_create, *run_target, *module_target, *inject_probability, *token;
 	char *run_argv[64];
 	int run_argc;
-	int status, crash_check, test_score, fd, random_injection;
+	int status, crash_check, test_score, fd, prob;
+	bool random_injection;
 	
 	int c;
 
 	crash_check = 0;
-	random_injection = 0;
+	random_injection = false;
 	module_target = NULL;
 	run_target = NULL;
 	inject_probability = NULL;
@@ -666,43 +667,71 @@ int main(int argc, char* argv[], char* envp[])
 		switch (c)
 		{
 		case 'r':
-			random_injection = 1;
-			inject_probability = optarg;
-			break;
+		  random_injection = true;
+		  inject_probability = optarg;
+		  prob = atoi( inject_probability );
+		  if( prob<=0 || prob>1000 ) {
+		    fprintf( stderr, "Injection probability %u is invalid; must be in interval (0, 1000]\n", prob );
+		    abort();
+		  }
+		  break;
 		case 'f':
-			crash_check = 1;
-			crash_create = optarg;
-			break;
+		  crash_check = 1;
+		  crash_create = optarg;
+		  break;
 		case 't':
-			run_target = optarg;
-			break;
+		  run_target = optarg;
+		  if( !module_target )
+		    module_target = run_target ;
+		  break;
 		case 'm':
-			module_target = optarg;
-			break;
+		  module_target = optarg;
+		  break;
 		case '?':
-			if (optopt == 'f')
-				fprintf (stderr, "Option -f requires an argument.\n");
-			else if (isprint (optopt))
-				fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-			else
-				fprintf (stderr,
-				"Unknown option character `\\x%x'.\n",
-				optopt);
-			return 1;
+		  if (optopt == 'f')
+		    fprintf (stderr, "Option -f requires an argument.\n");
+		  else if (isprint (optopt))
+		    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+		  else
+		    fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
+		  return 1;
 		default:
-			abort ();
+		  abort ();
 		}
 	}
 
-	if (!run_target || !module_target || optind >= argc)
+	if (!run_target || optind >= argc)
 	{
 		usage(argv[0]);
 		return -1;
 	}
+	assert( module_target );
 
-    xmlInitParser();
-    status = generate_stub(argv[optind], random_injection, inject_probability, module_target);
-    xmlCleanupParser();
+	// Do some sanity checking on the arguments
+	if ( access(run_target, X_OK) ) {
+	  switch( errno ) 
+	    {
+	    case EACCES:
+	      fprintf( stderr, "Permission denied on %s\n", run_target );
+	      exit(-1);
+	    case ELOOP:
+	      fprintf( stderr, "Too many symbolic links while getting to %s\n", run_target );
+	      exit(-1);
+	    case ENAMETOOLONG:
+	      fprintf( stderr, "File name too long: %s\n", run_target );
+	      exit(-1);
+	    case ENOENT:
+	      fprintf( stderr, "No such file (did you provide the full path?): %s\n", run_target );
+	      exit(-1);
+	    default:
+	      fprintf( stderr, "Cannot access %s\n", run_target );
+	      exit(-1);
+	    }
+	}
+
+	xmlInitParser();
+	status = generate_stub(argv[optind], random_injection, inject_probability, module_target);
+	xmlCleanupParser();
 
 	++optind;
 	if (0 == status)
