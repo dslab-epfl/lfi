@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan>
+  <trigger id="pthread_read" class="SemTrigger" />
+
+  <trigger id="random40" class="RandomTrigger">
+    <args>
+      <percent>10</percent>
+    </args>
+  </trigger>
+
+  <trigger id="cs_from_libsqlite" class="CallStackTrigger">
+    <args>
+      <frame>
+        <module>/usr/lib/libsqlite3.so.0.8.6</module>
+        <file>sqlite3.c</file>
+        <line>24805</line>
+      </frame>
+    </args>
+  </trigger>
+  
+  <!-- inform the pthread_read trigger about pthread_mutex_lock calls -->
+	<function name="pthread_mutex_lock" retval="0" errno="0">
+    <triggerx ref="pthread_read" />
+	</function>
+
+  <!-- inform the pthread_read trigger about pthread_mutex_unlock calls -->
+	<function name="pthread_mutex_unlock" retval="0" errno="0">
+    <triggerx ref="pthread_read" />
+	</function>
+
+
+  <!-- inject with 40% probability in a read call made from libsqlite
+       while the calling thread is holding a lock -->
+  <function name="fcntl" retval="-1" errno="EMFILE">
+    <triggerx ref="random40" />
+    <triggerx ref="pthread_read" />
+    <triggerx ref="cs_from_libsqlite" />
+  </function>
+
+</plan>

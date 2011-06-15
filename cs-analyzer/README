@@ -1,0 +1,21 @@
+
+LIB-FI call site analyzer
+
+Purpose: take a binary program and determine potentially vulnerable places for fault injection
+
+Usage:
+make
+cs-analyzer <target executable> <target function>|- [default retval] [default errno] > injection-scenarion.xml
+
+Where:
+<target executable> is the path to the executable to be analyzed
+
+<target function>|- is the function to analyze. Use '-' in order to analyze a pre-defined set of functions
+
+[default retval] and [default errno] are the values used in the generated injection scenario for the injected return value and
+injected errno value. If unspecified, they default to -1, respectively EINVAL
+
+The call site analyzer outputs to stdout a XML injection scenario that can be fed directly to LIB-FI for execution
+The call site analyzer outputs to stderr human-readable information corresponding to the generated scenario
+
+See the online documentation at https://sourceforge.net/apps/trac/lfi/wiki/Documentation for details.

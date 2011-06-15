@@ -1,0 +1,1659 @@
+<profile>
+<function name="setgrent">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+
+<function name="open">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+</error-codes>
+</function>
+
+<function name="chroot">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="unsetenv">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="textdomain">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="waitpid">
+<error-codes retval="-1">
+  <error-code>ECHILD</error-code>
+  <error-code>ECHILD</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ECHILD</error-code>
+</error-codes>
+</function>
+<function name="pause">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EINTR</error-code>
+</error-codes>
+</function>
+<function name="ioctl">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOTTY</error-code>
+  <error-code>ENOTTY</error-code>
+</error-codes>
+</function>
+<function name="writev">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+
+<function name="write">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+</error-codes>
+</function>
+
+<function name="siginterrupt">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="putspent">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="munlockall">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="getgrnam_r">
+<error-codes retval="-1">
+  <error-code>ENOENT</error-code>
+  <error-code>ESRCH</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sysconf">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="utime">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="sethostent">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="getlogin">
+<error-codes retval="-1">
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENXIO</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="recv">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="connect">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINPROGRESS</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>ETIMEDOUT</error-code>
+</error-codes>
+</function>
+<function name="tcgetsid">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>ENOTTY</error-code>
+</error-codes>
+</function>
+<function name="getgrent_r">
+<error-codes retval="-1">
+  <error-code>ENOENT</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sigemptyset">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="utimes">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="epoll_wait">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="strerror">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="putpmsg">
+<error-codes retval="-1">
+  <error-code>ENOSYS</error-code>
+</error-codes>
+</function>
+<function name="fdopen">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EEXIST</error-code>
+</error-codes>
+</function>
+<!--
+<function name="open64">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EEXIST</error-code>
+</error-codes>
+</function>
+-->
+
+<function name="strndup">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="msgctl">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="argz_add_sep">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="sigpause">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+</error-codes>
+</function>
+<function name="memmove">
+<error-codes />
+</function>
+<function name="hsearch">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="munmap">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENODEV</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="ulckpwdf">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sched_getparam">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="getgrgid">
+<error-codes retval="-1">
+  <error-code>ENOENT</error-code>
+  <error-code>ESRCH</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="fchmod">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="setfsuid">
+<error-codes retval="-1">
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="strtold">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="setpriority">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ESRCH</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EACCES</error-code>
+</error-codes>
+</function>
+<function name="getpriority">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ESRCH</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EACCES</error-code>
+</error-codes>
+</function>
+<function name="personality">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="getresuid">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+</error-codes>
+</function>
+<function name="gethostent_r">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="execve">
+<error-codes retval="-1">
+  <error-code>E2BIG</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOEXEC</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="semget">
+<error-codes retval="-1">
+  <error-code>EEXIST</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EEXIST</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSPC</error-code>
+</error-codes>
+</function>
+<function name="argz_insert">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="envz_get">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="hsearch_r">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="fchown">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="truncate">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EFBIG</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="getspnam_r">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="vm86">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="envz_add">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="fgetspent">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="hcreate">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="getpw">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="prctl">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="fchdir">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="msgrcv">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>E2BIG</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="shmat">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="tmpfile">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EEXIST</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOSPC</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="argz_count">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="execl">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>ENOEXEC</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+</error-codes>
+</function>
+<function name="sched_rr_get_interval">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="pclose">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ECHILD</error-code>
+</error-codes>
+</function>
+<function name="creat">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EEXIST</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENODEV</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSPC</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>ENXIO</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="getpwuid_r">
+<error-codes retval="-1">
+  <error-code>ENOENT</error-code>
+  <error-code>ESRCH</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="setrlimit">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EFBIG</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="dup2">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EBUSY</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="ustat">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOSYS</error-code>
+</error-codes>
+</function>
+<function name="sockatmark">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="execle">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>ENOEXEC</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+</error-codes>
+</function>
+<function name="getpass">
+<error-codes retval="-1">
+  <error-code>ENXIO</error-code>
+</error-codes>
+</function>
+<function name="argz_add">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="feof">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="argz_stringify">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="confstr">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="sched_setscheduler">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="sysinfo">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+</error-codes>
+</function>
+<function name="strtoll">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="iconv_open">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="gethostbyname2_r">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="recvfrom">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="strtoumax">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="statfs">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="fexecve">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ENOSYS</error-code>
+</error-codes>
+</function>
+<function name="pivot_root">
+<error-codes retval="-1">
+  <error-code>EBUSY</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="strtoul">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="sched_getscheduler">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="modify_ldt">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOSYS</error-code>
+</error-codes>
+</function>
+<function name="settimeofday">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="gethostbyaddr">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sigaltstack">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="adjtime">
+<error-codes retval="-1">
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="sgetspent_r">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="socket">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="select">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="readdir">
+<error-codes retval="0">
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="readdir64">
+<error-codes retval="0">
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="fstatfs">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="lchown">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="setgroups">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="hcreate_r">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="fgetspent_r">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="fflush">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="bind_textdomain_codeset">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="ftruncate">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EFBIG</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="fgetgrent">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="putenv">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="argz_create">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="lseek">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ESPIPE</error-code>
+  <error-code>ESPIPE</error-code>
+</error-codes>
+</function>
+<function name="sigaddset">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="mmap">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENODEV</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="setpgid">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="send">
+<error-codes retval="-1">
+  <error-code>EMSGSIZE</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EPIPE</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EMSGSIZE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPIPE</error-code>
+</error-codes>
+</function>
+<function name="getdomainname">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="envz_entry">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="epoll_ctl">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EEXIST</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="popen">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ECHILD</error-code>
+</error-codes>
+</function>
+<function name="mlock">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="acct">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="strtoq">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="strtol">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="pipe">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+</error-codes>
+</function>
+<function name="ether_hostton">
+<error-codes />
+</function>
+<function name="getpgrp">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="capget">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="accept">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ETIMEDOUT</error-code>
+</error-codes>
+</function>
+<function name="hdestroy_r">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="waitid">
+<error-codes retval="-1">
+  <error-code>ECHILD</error-code>
+  <error-code>ECHILD</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ECHILD</error-code>
+</error-codes>
+</function>
+<!--
+<function name="nanosleep">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EINTR</error-code>
+</error-codes>
+</function>
+-->
+<function name="cuserid">
+<error-codes retval="-1">
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENXIO</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="strtod">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sendfile">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="lckpwdf">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="ioperm">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="ulimit">
+<error-codes retval="-1">
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="sysctl">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="fdatasync">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EROFS</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="setpwent">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="bind">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EROFS</error-code>
+</error-codes>
+</function>
+<function name="readv">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="readahead">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="reboot">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="chdir">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOTDIR</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="sigwaitinfo">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="initgroups">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="setregid">
+<error-codes retval="-1">
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="posix_fadvise">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ESPIPE</error-code>
+</error-codes>
+</function>
+<function name="shmdt">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="fstatvfs">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="endgrent">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="setsockopt">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="fseek">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="argz_extract">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="mremap">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="shmget">
+<error-codes retval="-1">
+  <error-code>EEXIST</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EEXIST</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSPC</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="getdelim">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="setstate">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="uselib">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOEXEC</error-code>
+</error-codes>
+</function>
+<function name="swapoff">
+<error-codes retval="-1">
+  <error-code>EBUSY</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+<function name="wait">
+<error-codes retval="-1">
+  <error-code>ECHILD</error-code>
+  <error-code>ECHILD</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ECHILD</error-code>
+</error-codes>
+</function>
+<function name="mincore">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="scandir">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="fgetpwent_r">
+<error-codes retval="-1">
+  <error-code>ENOENT</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="ferror">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="unlockpt">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="rtime">
+<error-codes retval="-1">
+  <error-code>EIO</error-code>
+  <error-code>ETIMEDOUT</error-code>
+</error-codes>
+</function>
+<function name="setgid">
+<error-codes retval="-1">
+  <error-code>EPERM</error-code>
+</error-codes>
+</function>
+
+<function name="read">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+</error-codes>
+</function>
+
+<function name="setspent">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="get_current_dir_name">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ERANGE</error-code>
+  <error-code>EACCES</error-code>
+</error-codes>
+</function>
+<function name="getspnam">
+<error-codes retval="-1">
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="sendmsg">
+<error-codes retval="-1">
+  <error-code>EMSGSIZE</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EPIPE</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EMSGSIZE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPIPE</error-code>
+</error-codes>
+</function>
+<function name="sigorset">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="alphasort">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="sethostname">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+</error-codes>
+</function>
+<function name="versionsort">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="setpgrp">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EPERM</error-code>
+  <error-code>ESRCH</error-code>
+</error-codes>
+</function>
+<function name="setenv">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="getrusage">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="sendto">
+<error-codes retval="-1">
+  <error-code>EMSGSIZE</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EPIPE</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>EMSGSIZE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>EPIPE</error-code>
+</error-codes>
+</function>
+<function name="sched_get_priority_max">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="makecontext">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="epoll_create">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="sigfillset">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="listen">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+</error-codes>
+</function>
+<function name="sched_get_priority_min">
+<error-codes retval="-1">
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="posix_fallocate">
+<error-codes retval="-1">
+  <error-code>EBADF</error-code>
+  <error-code>EFBIG</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENODEV</error-code>
+  <error-code>ENOSPC</error-code>
+  <error-code>ESPIPE</error-code>
+</error-codes>
+</function>
+<function name="swapcontext">
+<error-codes retval="-1">
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="fork">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+<function name="execv">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>ENOEXEC</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+</error-codes>
+</function>
+<function name="statvfs">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBADF</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ENOSYS</error-code>
+  <error-code>ENOTDIR</error-code>
+</error-codes>
+</function>
+<function name="getgrent">
+<error-codes retval="-1">
+  <error-code>EINTR</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EMFILE</error-code>
+  <error-code>ENFILE</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>ERANGE</error-code>
+</error-codes>
+</function>
+<function name="execlp">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>ENOEXEC</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+</error-codes>
+</function>
+<function name="fputws_unlocked">
+<error-codes />
+</function>
+<function name="msgsnd">
+<error-codes retval="-1">
+  <error-code>EAGAIN</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>E2BIG</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+  <error-code>ENOMEM</error-code>
+  <error-code>E2BIG</error-code>
+  <error-code>EACCES</error-code>
+  <error-code>EAGAIN</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EINTR</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="sigaction">
+<error-codes retval="-1">
+  <error-code>EFAULT</error-code>
+  <error-code>EINVAL</error-code>
+</error-codes>
+</function>
+<function name="unlink">
+<error-codes retval="-1">
+  <error-code>EACCES</error-code>
+  <error-code>EBUSY</error-code>
+  <error-code>EFAULT</error-code>
+  <error-code>EIO</error-code>
+  <error-code>EISDIR</error-code>
+  <error-code>ELOOP</error-code>
+  <error-code>ENAMETOOLONG</error-code>
+  <error-code>ENOENT</error-code>
+  <error-code>ENOMEM</error-code>
+</error-codes>
+</function>
+
+</profile>

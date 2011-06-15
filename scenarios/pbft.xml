@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan>
+  <trigger id="random20" class="RandomTrigger">
+    <args>
+      <percent>20</percent>
+    </args>
+  </trigger>
+
+  <trigger id="random2" class="RandomTrigger">
+    <args>
+      <percent>2</percent>
+    </args>
+  </trigger>
+
+  <trigger id="random40" class="RandomTrigger">
+    <args>
+      <percent>40</percent>
+    </args>
+  </trigger>
+
+<trigger id="random80" class="RandomTrigger">
+    <args>
+      <percent>0</percent>
+    </args>
+  </trigger>
+
+  <trigger id="random100" class="RandomTrigger">
+    <args>
+      <percent>10</percent>
+    </args>
+  </trigger>
+
+  <!--
+       use a different instance for each function
+       as each must maintain its own call count
+  -->
+  <trigger id="readcc_readdir" class="CallCountTrigger">
+    <args>
+      <callcount>10</callcount>
+    </args>
+  </trigger>
+
+  <trigger id="readcc_readdir64" class="CallCountTrigger">
+    <args>
+      <callcount>10</callcount>
+    </args>
+  </trigger>
+
+  <!-- only usable if you have libdwarf and compiled
+       ls/id with debug information
+   -->
+  <trigger id="trig1" class="CallStackTrigger">
+    <args>
+      <frame>
+        <module>/usr/local/bin/ls</module>
+        <file>ls.c</file>
+        <line>2405</line>
+      </frame>
+    </args>
+    </trigger>
+    
+	<trigger id="trig2" class="CallStackTrigger">
+    <args>
+      <frame>
+        <module>/usr/local/bin/id</module>
+        <file>id.c</file>
+        <line>235</line>
+      </frame>
+    </args>
+    </trigger>
+    
+  <trigger id="ri" class="ReadInspector" />
+
+  <trigger id="ni" class="NetInspector" />
+
+  <function name="sendto" retval="-1" argc="6" errno="EINTR">
+	<triggerx ref="ni" />
+  </function>
+
+<function name="recvfrom" retval="-1" argc="6" errno="EINTR">
+	<triggerx ref="ni" />
+  </function>
+
+
+	
+</plan>

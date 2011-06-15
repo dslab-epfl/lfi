@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  use
+    ./libfi sampleplan.xml -t /bin/ls
+  or
+    ./libfi sampleplan.xml -t /bin/cat
+  to test this scenario
+-->
+<plan>
+  <trigger id="random20" class="RandomTrigger">
+    <args>
+      <percent>20</percent>
+    </args>
+  </trigger>
+
+  <trigger id="random40" class="RandomTrigger">
+    <args>
+      <percent>40</percent>
+    </args>
+  </trigger>
+
+  <!--
+       use a different instance for each function
+       as each must maintain its own call count
+  -->
+  <trigger id="readcc_readdir" class="CallCountTrigger">
+    <args>
+      <callcount>11</callcount>
+    </args>
+  </trigger>
+
+  <trigger id="readcc_readdir64" class="CallCountTrigger">
+    <args>
+      <callcount>11</callcount>
+    </args>
+  </trigger>
+
+  <!-- only usable if you have libdwarf and compiled
+       ls/id with debug information
+   -->
+  <trigger id="trig1" class="CallStackTrigger">
+    <args>
+      <frame>
+        <module>/usr/local/bin/ls</module>
+        <file>ls.c</file>
+        <line>2405</line>
+      </frame>
+    </args>
+    </trigger>
+    
+	<trigger id="trig2" class="CallStackTrigger">
+    <args>
+      <frame>
+        <module>/usr/local/bin/id</module>
+        <file>id.c</file>
+        <line>235</line>
+      </frame>
+    </args>
+    </trigger>
+    
+  <trigger id="ri" class="ReadInspector" />
+
+  <!-- inject with 20% probability when reading 1024 bytes from stdin -->
+	<function name="read" argc="3" retval="-1" errno="0">
+    <triggerx ref="random20" />
+		<triggerx ref="ri" />
+	</function>
+
+  <!-- inject after 10 readdir calls -->
+  <function name="readdir" retval="0" errno="EBADF">
+    <triggerx ref="readcc_readdir" />
+  </function>
+
+  <!-- inject after 10 readdir64 calls -->
+  <function name="readdir64" retval="0" errno="EBADF">
+    <triggerx ref="readcc_readdir64" />
+  </function>
+</plan>

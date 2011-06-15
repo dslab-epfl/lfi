@@ -54,113 +54,191 @@ using namespace std;
 #define	REPLAYFILE	"replay.xml"
 
 
-#define VERSION2
-
 #define CRASH_METRIC		(int)1e8
 #define FAILURE_METRIC		(int)1e6
 #define TIME_MULTIPLIER		1
 
-void usage(char* me)
+/*
+#ifdef __x86_64__
+	#error "x86_64 target not supported"
+#endif
+*/
+static void
+usage(char* me)
 {
     cout << "Usage: ";
-    cout << me << " <configFile> -t <targetExecutable> [-m <targetModule>] [-r <injectionProb>] [-f <crashFile>]" << endl;
+    cout << me << " <configurationFile> [-t <targetExecutable>]" << endl;
 }
 
-/************************************************************************/
-/*	void print_xpath_nodesv2(xmlNodeSetPtr nodes, ofstream& out)        */
-/*	                                                                    */
-/*	XML file parser for the targeted injection format                   */
-/*	outputs C code based on the XML nodes received                      */
-/************************************************************************/
+static void
+print_attribute_names(xmlAttrPtr a_node, ofstream& out)
+{
+    for (; a_node; a_node = a_node->next) {
+		out << " " << a_node->name << "=\\\"" << a_node->children->content << "\\\"";
+		if (a_node->next)
+			out << " ";
+	}
+}
 
-void print_xpath_nodesv2(xmlNodeSetPtr nodes, ofstream& out)
+static void
+print_element_names(xmlNodePtr a_node, ofstream& out)
+{
+    xmlNodePtr cur_node = NULL;
+	xmlChar ch;
+	int i;
+
+    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            out << "<" << cur_node->name;
+			print_attribute_names(cur_node->properties, out);
+			out << ">";
+		} else if (cur_node->type == XML_TEXT_NODE) {
+			i = 0;
+			while (0 != (ch = cur_node->content[i++]))
+			{
+				if (ch == '\r' || ch == '\n')
+					out << "\\";
+				out << ch;
+			}
+		}
+
+        print_element_names(cur_node->children, out);
+
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            out << "</" << cur_node->name << ">";
+        }
+    }
+}
+
+static void
+print_triggers(xmlNodeSetPtr nodes, ofstream& out)
 {
 	xmlNodePtr cur;
-	xmlChar* functionName, *call_count, *return_value, *errno_value, *call_original;
+	xmlChar *triggerId;
+	xmlChar *triggerClass;
+
 	int size;
 	int i, fn_count;
-
-	size = (nodes) ? nodes->nodeNr : 0;
-	fn_count = 0;
-
-	out << "struct fninfov1 " << "function_infov1[1];" << endl;
-	out << "struct fninfov2 " << "function_infov2[] = {" << endl;
-	for(i = 0; i < size; ++i)
-	{
-		assert(nodes->nodeTab[i]);
-
-		if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-		{
-			cur = nodes->nodeTab[i];   	    
-			functionName = xmlGetProp(cur, (xmlChar*)"name");
-			call_count = xmlGetProp(cur, (xmlChar*)"inject");
-			errno_value = xmlGetProp(cur, (xmlChar*)"errno");
-			return_value = xmlGetProp(cur, (xmlChar*)"retval");
-			call_original = xmlGetProp(cur, (xmlChar*)"calloriginal");
-
-			if (functionName && call_count && errno_value && return_value && call_original)
-			{
-				out << "\t{ \"" << functionName << "\", ";
-				out << call_count << ", ";
-				out << return_value << ", ";
-				out << errno_value << ", ";
-				out << call_original << "}," << endl;
-				++fn_count;
-			}
-			if (functionName)
-				xmlFree(functionName);
-			if (call_count)
-				xmlFree(call_count);
-			if (errno_value)
-				xmlFree(errno_value);
-			if (return_value)
-				xmlFree(return_value);
-			if (call_original)
-				xmlFree(call_original);
-		}
-	}
-	out << "};" << endl;
-	out << "int fn_count = " << fn_count << ";" << endl;
-
-
-	set<string> generated_stubs;
-	for(i = 0; i < size; ++i)
-	{
-		assert(nodes->nodeTab[i]);
-
-		if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-		{
-			cur = nodes->nodeTab[i];   	    
-			functionName = xmlGetProp(cur, (xmlChar*)"name");
-			if (functionName && generated_stubs.end() == generated_stubs.find((char*)functionName))
-			{
-				out << "#ifdef __x86_64__" << endl;
-				out << "GENERATE_STUBv2_x64(" << (char*)functionName << ")" << endl << endl;
-				out << "#else" << endl;
-				out << "GENERATE_STUBv2(" << (char*)functionName << ")" << endl;
-				out << "#endif" << endl << endl;
-				generated_stubs.insert((char*)functionName);
-				xmlFree(functionName);
-			}
-		}
-	}
-}
-
-
-
-void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
-{
-	xmlNodePtr cur;
-	xmlChar* functionName, *functionName2, *call_count, *return_value, *errno_value, *call_original;
-	int size;
-	int i, j, fn_count;
 	set<string> functionsUsed;
 
 	size = (nodes) ? nodes->nodeNr : 0;
 	fn_count = 0;
 
-	out << "struct fninfov1 " << "function_infov1[1];" << endl;
-	out << "struct fninfov2 " << "function_infov2[1];" << endl;
+	for(i = 0; i < size; ++i)
+	{
+        assert(nodes->nodeTab[i]);
+
+		cur = nodes->nodeTab[i];
+        if(cur->type == XML_ELEMENT_NODE)
+        {
+            triggerId = xmlGetProp(cur, (xmlChar*)"id");
+			triggerClass = xmlGetProp(cur, (xmlChar*)"class");
+
+			if (triggerId && triggerClass)
+			{
+				out << "struct TriggerDesc trigger_" << triggerId << " = { \"" << triggerId << "\", ";
+				out << "\"" << triggerClass << "\", NULL, ";
+				
+				xmlFree(triggerId);
+				xmlFree(triggerClass);
+
+				cur = cur->children;
+				while (cur && xmlStrcmp(cur->name, (const xmlChar *)"args"))
+				{
+					cur = cur->next;
+				}
+				if (cur)
+				{
+					out << "\"";
+					print_element_names(cur, out);
+					out << "\"";
+				} else {
+					out << "\"\"";
+				}
+				out << " };" << endl;
+			}
+		}
+	}
+}
+
+static void
+print_function(xmlNodePtr fn, int triggerListId, ofstream& out)
+{
+	const char defErrno[] = "0";
+	const char defCallOriginal[] = "0";
+	const char defArgc[] = "0";
+
+	xmlChar* functionName, *return_value,
+		*errno_value, *call_original, *argc;
+	
+	functionName = xmlGetProp(fn, (xmlChar*)"name");
+	errno_value = xmlGetProp(fn, (xmlChar*)"errno");
+	return_value = xmlGetProp(fn, (xmlChar*)"retval");
+	call_original = xmlGetProp(fn, (xmlChar*)"calloriginal");
+	argc = xmlGetProp(fn, (xmlChar*)"argc");
+
+	if (functionName && return_value)
+	{
+		out << "\t{ \"" << functionName << "\", ";
+		out << return_value << ", ";
+		out << (errno_value ? (char*)errno_value : defErrno) << ", ";
+		out << (call_original ? (char*)call_original : defCallOriginal) << ", ";
+		out << (argc ? (char*)argc : defArgc) << ", ";
+		out << "triggerList_" << triggerListId;
+		out << " }," << endl;
+	}
+
+	if (functionName)
+		xmlFree(functionName);
+	if (errno_value)
+		xmlFree(errno_value);
+	if (return_value)
+		xmlFree(return_value);
+	if (call_original)
+		xmlFree(call_original);
+	if (argc)
+		xmlFree(argc);
+}
+
+static void
+print_trigger_list(xmlNodePtr fn, int triggerListId, ofstream& out)
+{
+	xmlNodePtr cur;
+	xmlChar *triggerId;
+
+	cur = fn->children;
+	out << "TriggerDesc* triggerList_" << triggerListId << "[] = { ";
+
+	while (cur)
+	{
+		if (cur->type == XML_ELEMENT_NODE &&
+			0 == xmlStrcmp(cur->name, (const xmlChar *)"triggerx"))
+		{
+			triggerId = xmlGetProp(cur, (xmlChar*)"ref");
+			if (triggerId)
+			{
+				out << "&trigger_" << triggerId << ", ";
+				xmlFree(triggerId);
+			}
+		}
+		cur = cur->next;
+	}
+	out << "NULL };" << endl;
+}
+
+static void
+print_stubs(xmlNodeSetPtr nodes, ofstream& out)
+{
+	xmlNodePtr cur;
+	xmlChar *functionName;
+	xmlChar *functionName2;
+	int size;
+	int i, j, triggerListId, triggerListIdBase;
+	set<string> functionsUsed;
+
+	size = (nodes) ? nodes->nodeNr : 0;
+
+	triggerListId = 1;
 	for(i = 0; i < size; ++i)
 	{
         assert(nodes->nodeTab[i]);
@@ -169,33 +247,13 @@ void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
         {
             cur = nodes->nodeTab[i];
             functionName = xmlGetProp(cur, (xmlChar*)"name");
-			if (functionsUsed.find((char*)functionName) != functionsUsed.end())
+			if (!functionName || functionsUsed.find((char*)functionName) != functionsUsed.end())
 				continue;
-			call_count = xmlGetProp(cur, (xmlChar*)"inject");
-			errno_value = xmlGetProp(cur, (xmlChar*)"errno");
-			return_value = xmlGetProp(cur, (xmlChar*)"retval");
-			call_original = xmlGetProp(cur, (xmlChar*)"calloriginal");
-
-
-			out << "struct fninfov2 function_info_" << functionName << "[] = {\n";
-
-			out << "\t{ \"" << functionName << "\", ";
-			out << call_count << ", ";
-			out << return_value << ", ";
-			out << errno_value << ", ";
-			out << call_original << "}," << endl;
 
 			functionsUsed.insert((char*)functionName);
-
-			if (call_count)
-				xmlFree(call_count);
-			if (errno_value)
-				xmlFree(errno_value);
-			if (return_value)
-				xmlFree(return_value);
-			if (call_original)
-				xmlFree(call_original);
-
+			
+			triggerListIdBase = triggerListId;
+			print_trigger_list(cur, triggerListId++, out);
 			for(j = i+1; j < size; ++j)
 			{
 				assert(nodes->nodeTab[j]);
@@ -203,46 +261,49 @@ void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
 				{
 					cur = nodes->nodeTab[j];
 		            functionName2 = xmlGetProp(cur, (xmlChar*)"name");
-					if (0 == strcmp((char*)functionName, (char*)functionName2))
+					if (functionName2)
 					{
-						call_count = xmlGetProp(cur, (xmlChar*)"inject");
-						errno_value = xmlGetProp(cur, (xmlChar*)"errno");
-						return_value = xmlGetProp(cur, (xmlChar*)"retval");
-						call_original = xmlGetProp(cur, (xmlChar*)"calloriginal");
-
-						out << "\t{ \"" << functionName << "\", ";
-						out << call_count << ", ";
-						out << return_value << ", ";
-						out << errno_value << ", ";
-						out << call_original << "}," << endl;
-
-						if (functionName2)
-							xmlFree(functionName2);
-						if (call_count)
-							xmlFree(call_count);
-						if (errno_value)
-							xmlFree(errno_value);
-						if (return_value)
-							xmlFree(return_value);
-						if (call_original)
-							xmlFree(call_original);
+						if (0 == strcmp((char*)functionName, (char*)functionName2))
+						{
+							print_trigger_list(cur, triggerListId++, out);
+						}
+						xmlFree(functionName2);
 					}
 				}
-
 			}
 
-			++fn_count;
+			out << "struct fninfov2 function_info_" << functionName << "[] = {\n";
+			
+			triggerListId = triggerListIdBase;
+			
+			cur = nodes->nodeTab[i];
+			print_function(cur, triggerListId++, out);
+			for(j = i+1; j < size; ++j)
+			{
+				assert(nodes->nodeTab[j]);
+				if(nodes->nodeTab[j]->type == XML_ELEMENT_NODE)
+				{
+					cur = nodes->nodeTab[j];
+		            functionName2 = xmlGetProp(cur, (xmlChar*)"name");
+					if (functionName2)
+					{
+						if (0 == strcmp((char*)functionName, (char*)functionName2))
+						{
+							print_function(cur, triggerListId++, out);
+						}
+						xmlFree(functionName2);
+					}
+				}
+			}
 
+			out << "\t{ \"\", 0, 0, 0, 0, NULL }" << endl;
 			out << "};\n";
 
-			if (functionName)
-				xmlFree(functionName);
+			xmlFree(functionName);
 		}
 	}
 	
-	out << "int fn_count = " << fn_count << ";" << endl;
-
-
+	out << "extern \"C\" {" << endl;
 	set<string> generated_stubs;
 	for(i = 0; i < size; ++i)
 	{
@@ -255,7 +316,7 @@ void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
 			if (functionName && generated_stubs.end() == generated_stubs.find((char*)functionName))
 			{
 				out << "#ifdef __x86_64__" << endl;
-				out << "GENERATE_STUBv2_x64(" << (char*)functionName << ")" << endl << endl;
+				out << "GENERATE_STUBv2_x64(" << (char*)functionName << ")" << endl;
 				out << "#else" << endl;
 				out << "GENERATE_STUBv2(" << (char*)functionName << ")" << endl;
 				out << "#endif" << endl << endl;
@@ -264,167 +325,9 @@ void print_xpath_nodesv2_fromv1(xmlNodeSetPtr nodes, ofstream& out)
 			}
 		}
 	}
+	out << "}" << endl;
 }
 
-
-/************************************************************************/
-/*	void print_xpath_nodesv1(xmlNodeSetPtr nodes, ofstream& out)        */
-/*                                                                      */
-/*	XML file parser for the random injection file format                */
-/*	outputs C code based on the XML nodes received                      */
-/************************************************************************/
-void print_xpath_nodesv1(xmlNodeSetPtr nodes, ofstream& out)
-{
-    xmlNodePtr cur;
-    xmlChar* functionName;
-	xmlChar* nodeValue;
-	xmlChar* returnValue;
-    int size;
-    int i, error_count, fn_count, total_errors;
-    
-    size = (nodes) ? nodes->nodeNr : 0;
-    fn_count = 0;
-    total_errors = 0;
-
-    for(i = 0; i < size; ++i)
-    {
-        assert(nodes->nodeTab[i]);
-
-        if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-        {
-            cur = nodes->nodeTab[i];   	    
-            functionName = xmlGetProp(cur, (xmlChar*)"name");
-            if (functionName)
-            {
-				if (cur->children && cur->children->next && cur->children->next->children)
-				{
-					error_count = 0;
-					returnValue = xmlGetProp(cur->children->next, (xmlChar*)"retval");
-					out << "struct error_description " << (char*)functionName << "_error_description[] = {" << endl;
-					for (cur = cur->children->next->children; cur; cur = cur->next)
-					{
-						if (XML_ELEMENT_NODE == cur->type)
-						{
-							nodeValue = xmlNodeGetContent(cur);
-							if (NULL != nodeValue)
-							{
-								++error_count;
-								out << "\t{" << returnValue << ", " << (char*)nodeValue << "}," << endl;
-								++total_errors;
-								xmlFree(nodeValue);
-							}
-						}
-					}
-					out << "};" << endl;
-				}
-                
-                xmlFree(functionName);
-            }
-        }
-    }
-	out << "struct fninfov2 " << "function_infov2[1];" << endl;
-	out << "struct fninfov1 " << "function_infov1[] = {" << endl;
-	for(i = 0; i < size; ++i)
-	{
-		assert(nodes->nodeTab[i]);
-
-		if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-		{
-			cur = nodes->nodeTab[i];   	    
-			functionName = xmlGetProp(cur, (xmlChar*)"name");
-			if (functionName)
-			{
-				if (cur->children && cur->children->next && cur->children->next->children)
-				{
-					error_count = 0;
-					for (cur = cur->children->next->children; cur; cur = cur->next)
-					{
-						if (XML_ELEMENT_NODE == cur->type)
-						{
-							nodeValue = xmlNodeGetContent(cur);
-							if (NULL != nodeValue)
-							{
-								++error_count;
-								xmlFree(nodeValue);
-								++total_errors;
-							}
-						}
-					}
-					out << "\t{ \"" << functionName << "\", ";
-					out << error_count << ", ";
-					out << (char*)functionName << "_error_description }," << endl;
-					
-					++fn_count;
-				}
-
-				xmlFree(functionName);
-			}
-		}
-	}
-	out << "};" << endl;
-	out << "int fn_count = " << fn_count << ";" << endl;
-
-	/* for the optimized random version */
-	for(i = 0; i < size; ++i)
-	{
-		assert(nodes->nodeTab[i]);
-
-		if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-		{
-			cur = nodes->nodeTab[i];   	    
-			functionName = xmlGetProp(cur, (xmlChar*)"name");
-			if (functionName)
-			{
-				if (cur->children && cur->children->next && cur->children->next->children)
-				{
-					error_count = 0;
-					for (cur = cur->children->next->children; cur; cur = cur->next)
-					{
-						if (XML_ELEMENT_NODE == cur->type)
-						{
-							nodeValue = xmlNodeGetContent(cur);
-							if (NULL != nodeValue)
-							{
-								++error_count;
-								xmlFree(nodeValue);
-								++total_errors;
-							}
-						}
-					}
-					out << "struct fninfov1 function_info_" << functionName << " = {\"";
-					out << functionName << "\", " << error_count << ", ";
-					out << (char*)functionName << "_error_description };" << endl;
-				}
-
-				xmlFree(functionName);
-			}
-		}
-	}
-
-	set<string> generated_stubs;
-	for(i = 0; i < size; ++i)
-	{
-		assert(nodes->nodeTab[i]);
-
-		if(nodes->nodeTab[i]->type == XML_ELEMENT_NODE)
-		{
-			cur = nodes->nodeTab[i];   	    
-			functionName = xmlGetProp(cur, (xmlChar*)"name");
-			if (functionName)
-			{
-				if (cur->children && cur->children->next && cur->children->next->children &&
-					generated_stubs.end() == generated_stubs.find((char*)functionName))
-				{
-					out << "GENERATE_STUBv2(" << (char*)functionName << ")" << endl << endl;
-					generated_stubs.insert((char*)functionName);
-				}
-
-				xmlFree(functionName);
-			}
-		}
-	}
-	cout << "total errors: " << total_errors << endl;
-}
 
 /************************************************************************/
 /*	int compile_file(char* cfile, char* outfile)                        */
@@ -436,10 +339,12 @@ int compile_file(char* cfile, char* outfile)
 {
 	char cmd[1024];
 	int status;
+	sprintf(cmd, "g++ -g -o %s %s inter.c Trigger.cpp triggers/*.cpp `xml2-config --cflags` `xml2-config --libs` -O0 -shared -fPIC -lrt -ldl", outfile, cfile);
 
-	sprintf(cmd, "gcc -g -o %s %s inter.c -O0 -shared -dynamic -fPIC -ldl", outfile, cfile);
-	
-	cerr << "compiling stub library " << outfile << " from " << cfile << endl;
+        // use the following line instead if you need debug information support (after installing libelf, libdwarf and the appropriate trigger)
+        //sprintf(cmd, "g++ -g -o %s %s inter.c Trigger.cpp triggers/*.cpp `xml2-config --cflags` `xml2-config --libs` -O0 -shared -fPIC -lrt -ldl -ldwarf -lelf", outfile, cfile);
+
+	cerr << "Compiling stub library " << outfile << " from " << cfile << endl;
 	cerr << cmd << " ..." << endl;
 
 	status = system(cmd);
@@ -450,21 +355,27 @@ int compile_file(char* cfile, char* outfile)
 	}
 	else
 	{
-		cerr << "compiled successfully..." << endl;
+		cerr << "Compiled successfully..." << endl;
 	}
-	sprintf( cmd, "rm -f %s.* inter.c.*", cfile );
-	system( cmd );
     return 0;
 }
 
-int generate_stub(char* config, bool random_injection, char* inject_probability, char* module_target)
+int generate_stub(char* config)
 {
     xmlDocPtr doc;
     xmlXPathContextPtr xpathCtx;
-    xmlXPathObjectPtr xpathObj;
+    xmlXPathObjectPtr xpathObjTriggers;
+	xmlXPathObjectPtr xpathObj;
     xmlChar *xpathExpr = (xmlChar*)"//function";
+	xmlChar *xpathExprTriggers = (xmlChar*)"//trigger";
 
-	cerr << "generating stub file " << STUBC << " from " << config << endl;
+	cerr << "Generating stub file " << STUBC << " from " << config << endl;
+
+    /* Print results */
+    ofstream outf(STUBC);
+
+	outf << "#include \"inter.h\"" << endl;
+	outf << "STUB_VAR_DECL" << endl << endl;
 
     doc = xmlParseFile(config);
     if (doc == NULL) {
@@ -479,6 +390,14 @@ int generate_stub(char* config, bool random_injection, char* inject_probability,
         return(-1);
     }
 
+    xpathObjTriggers = xmlXPathEvalExpression(xpathExprTriggers, xpathCtx);
+    if(xpathObjTriggers == NULL) {
+        cerr << "Error: unable to evaluate xpath expression \"" << xpathExprTriggers << "\"" << endl;
+        xmlXPathFreeContext(xpathCtx); 
+        xmlFreeDoc(doc); 
+        return(-1);
+    }
+
     xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx);
     if(xpathObj == NULL) {
         cerr << "Error: unable to evaluate xpath expression \"" << xpathExpr << "\"" << endl;
@@ -487,33 +406,12 @@ int generate_stub(char* config, bool random_injection, char* inject_probability,
         return(-1);
     }
 
-    /* Print results */
-    ofstream outf(STUBC);
-
-	outf << "#include \"inter.h\"" << endl;
-	outf << "STUB_VAR_DECL" << endl << endl;
-
-	/* outf << "int only_trace = " << 0 << ";" << endl; */
-	outf << "char TARGET_EXE[] = \"" << module_target << "\";" << endl;
-	if (random_injection)
-	{
-		outf << "int random_inject_probability = " << inject_probability << ";" << endl;
-		outf << "#define determine_action determine_actionv1_o" << endl;
-	}
-	else
-	{
-		/* random_inject_probability is unused in plan-injection mode*/
-		outf << "int random_inject_probability = 0;" << endl;
-		outf << "#define determine_action determine_actionv2_o" << endl;
-	}
-	
-	if (random_injection)
-		print_xpath_nodesv1(xpathObj->nodesetval, outf);
-	else
-		print_xpath_nodesv2_fromv1(xpathObj->nodesetval, outf);
+	print_triggers(xpathObjTriggers->nodesetval, outf);
+	print_stubs(xpathObj->nodesetval, outf);
 
     /* Cleanup */
     xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeObject(xpathObjTriggers);
     xmlXPathFreeContext(xpathCtx);
     xmlFreeDoc(doc);
 
@@ -573,7 +471,7 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 			newarg[i] = argv[i];
         newarg[argc] = NULL;
 
-		gettimeofday(&tvstart, NULL);
+	gettimeofday(&tvstart, NULL);
         if (0 == (monitor = fork()))
         {
             execve(argv[0], newarg, newenv);
@@ -604,7 +502,7 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 						cerr << "Process exited normally. Exit status: " << exit_status << endl;
 						if (exit_status)
 						{
-							return_value = FAILURE_METRIC;
+							return_value = exit_status;
 						}
 						else
 						{
@@ -623,10 +521,8 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 						fd = open(REPLAYFILE, O_WRONLY|O_APPEND);
 						write(fd, "</plan>\n", 8);
 						close(fd);
-						fd = open(LOGFILE, O_WRONLY|O_APPEND);
-						close(fd);
 						
-						return_value = CRASH_METRIC;
+						return_value = 128+WTERMSIG(status);
 					}
 				}
 			}
@@ -646,46 +542,28 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 
 int main(int argc, char* argv[], char* envp[])
 {
-        char *crash_create, *run_target, *module_target, *inject_probability, *token;
+    char *crash_create, *run_target, *token;
 	char *run_argv[64];
 	int run_argc;
-	int status, crash_check, test_score, fd, prob;
-	bool random_injection;
+	int status, crash_check, test_score;
 	
 	int c;
 
 	crash_check = 0;
-	random_injection = false;
-	module_target = NULL;
 	run_target = NULL;
-	inject_probability = NULL;
 	
 	opterr = 0;
 
-	while ((c = getopt (argc, argv, "r:t:f:m:")) != -1)
+	while ((c = getopt (argc, argv, "t:f:")) != -1)
 	{
 		switch (c)
 		{
-		case 'r':
-		  random_injection = true;
-		  inject_probability = optarg;
-		  prob = atoi( inject_probability );
-		  if( prob<=0 || prob>1000 ) {
-		    fprintf( stderr, "Injection probability %u is invalid; must be in interval (0, 1000]\n", prob );
-		    abort();
-		  }
-		  break;
 		case 'f':
 		  crash_check = 1;
 		  crash_create = optarg;
 		  break;
 		case 't':
 		  run_target = optarg;
-		  if( !module_target )
-		    module_target = run_target ;
-		  break;
-		case 'm':
-		  module_target = optarg;
 		  break;
 		case '?':
 		  if (optopt == 'f')
@@ -700,59 +578,32 @@ int main(int argc, char* argv[], char* envp[])
 		}
 	}
 
-	if (!run_target || optind >= argc)
+	if (optind >= argc)
 	{
 		usage(argv[0]);
 		return -1;
 	}
-	assert( module_target );
 
-	// Do some sanity checking on the arguments
-	if ( access(run_target, X_OK) ) {
-	  switch( errno ) 
-	    {
-	    case EACCES:
-	      fprintf( stderr, "Permission denied on %s\n", run_target );
-	      exit(-1);
-	    case ELOOP:
-	      fprintf( stderr, "Too many symbolic links while getting to %s\n", run_target );
-	      exit(-1);
-	    case ENAMETOOLONG:
-	      fprintf( stderr, "File name too long: %s\n", run_target );
-	      exit(-1);
-	    case ENOENT:
-	      fprintf( stderr, "No such file (did you provide the full path?): %s\n", run_target );
-	      exit(-1);
-	    default:
-	      fprintf( stderr, "Cannot access %s\n", run_target );
-	      exit(-1);
-	    }
+	//++optind;
+	run_argc = 0;
+	token = strtok(run_target, "\t ");
+	while (token)
+	{
+		run_argv[run_argc++] = token;
+		token = strtok(NULL, "\t ");
 	}
-
-	xmlInitParser();
-	status = generate_stub(argv[optind], random_injection, inject_probability, module_target);
+	
+	LIBXML_TEST_VERSION
+	status = generate_stub(argv[optind]);
 	xmlCleanupParser();
-
-	++optind;
-	if (0 == status)
-	{
-		run_argc = 0;
-		token = strtok(run_target, "\t ");
-		while (token)
-		{
-			run_argv[run_argc++] = token;
-			token = strtok(NULL, "\t ");
+	
+	test_score = 0;
+	if (run_target) {
+		if (0 == status) {
+			if ((test_score = run_subject(run_argc, run_argv, STUBEX, envp)) < 0)
+				cerr << "A problem occurred starting the target" << endl;
 		}
-		if ((test_score = run_subject(run_argc, run_argv, STUBEX, envp)) < 0)
-			cerr << "A problem occurred running the subject" << endl;
 	}
-	if (crash_check && CRASH_METRIC == test_score)
-	{
-		fd = open(crash_create, O_WRONLY|O_CREAT, 0644);
-		close(fd);
-	}
-	cout << test_score << endl;
-    return 0;
+
+	return test_score;
 }
-
-
