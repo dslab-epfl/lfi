@@ -32,6 +32,7 @@
 #include <time.h>
 #include <signal.h>
 #include <stdint.h>
+#include <pthread.h>
 
 #include "Trigger.h"
 #include "inter.h"
@@ -50,6 +51,20 @@
 
 extern int log_fd, replay_fd;
 extern int init_done;
+
+/* stores the return address across the original library function call */ 
+#ifdef __APPLE__ 
+pthread_key_t return_address_key; 
+#else 
+static __thread long return_address; 
+#endif 
+ 
+/* avoid intercepting our function calls */ 
+#ifdef __APPLE__
+pthread_key_t no_intercept_key;
+#else
+static __thread int no_intercept;
+#endif
 
 uint64_t tsc() {
   uint32_t low, high;
@@ -89,6 +104,13 @@ my_init(void)
 	sa.sa_sigaction = lfi_segv_handler;
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
+#ifdef __APPLE__
+	int err;
+	err = pthread_key_create(&return_address_key, NULL);
+	err |= pthread_key_create(&no_intercept_key, NULL);
+	if (err)
+		write(2, "Failed to create thread keys\n", 29);
+#endif
 	init_done = 1;
 }
 
@@ -101,6 +123,47 @@ my_fini(void)
 	close(log_fd);
 #endif
 }
+
+long get_return_address()
+{
+	long r;
+#ifdef __APPLE__
+	r = (long)pthread_getspecific(return_address_key);
+#else
+	r = return_address;
+#endif
+	return r;
+}
+
+long get_no_intercept()
+{
+	long r;
+#ifdef __APPLE__
+	r = (long)pthread_getspecific(no_intercept_key);
+#else
+	r = no_intercept;
+#endif
+	return r;
+}
+
+void set_return_address(long value)
+{
+#ifdef __APPLE__
+	pthread_setspecific(return_address_key, (void*)value);
+#else
+	return_address = value;
+#endif
+}
+
+void set_no_intercept(long value)
+{
+#ifdef __APPLE__
+	pthread_setspecific(no_intercept_key, (void*)value);
+#else
+	no_intercept = value;
+#endif
+}
+
 
 /************************************************************************/
 /* returns the action that should be taken based on the triggers        */

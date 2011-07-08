@@ -75,4 +75,9 @@
   <function name="readdir64" retval="0" errno="EBADF">
     <triggerx ref="readcc_readdir64" />
   </function>
+
+  <!-- for MacOS 10.6 (x86_64) -->
+  <function name="fts_read" alias="fts_read$INODE64" retval="0" errno="EBADF">
+    <triggerx ref="random20" />
+  </function>
 </plan>

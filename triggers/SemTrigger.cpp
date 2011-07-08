@@ -29,26 +29,52 @@
 #include <stdarg.h>
 #include <execinfo.h>
 
-__thread int SemTrigger::lockCount = 0;
+#ifdef __APPLE__
+pthread_key_t SemTrigger::lockCount_key = 0;
+#else
+__thread long SemTrigger::lockCount = 0;
+#endif
 
 SemTrigger::SemTrigger()
 {
+	if (!lockCount_key)
+		pthread_key_create(&lockCount_key, NULL);
 }
+
+long SemTrigger::get_lockCount()
+{
+#ifdef __APPLE__
+	return (long)pthread_getspecific(lockCount_key);
+#else
+	return lockCount;
+#endif
+}
+
+void SemTrigger::set_lockCount(long v)
+{
+#ifdef __APPLE__
+	pthread_setspecific(lockCount_key, (void*)v);
+#else
+	lockCount = v;
+#endif
+}
+
 
 bool SemTrigger::Eval(const string& functionName, ...)
 {
+	long l;
 	if (functionName == "pthread_mutex_lock")
 	{
-		++lockCount;
+		set_lockCount(get_lockCount()+1);
 	}
 	else if (functionName == "pthread_mutex_unlock")
 	{
-		if (lockCount) // sanity check
-			--lockCount;
+		if (l = get_lockCount()) // sanity check
+			set_lockCount(l - 1);
 	}
 	else
 	{
-		if (lockCount > 0)
+		if (get_lockCount() > 0)
 			return true;
 	}
 	return false;

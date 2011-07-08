@@ -83,10 +83,25 @@ struct fninfov2
 	TriggerDesc **triggers;
 };
 
-/* stores the return address across the original library function call */
+/* stores the return address across the original library function call
+#ifdef __APPLE__
+pthread_key_t return_address_key;
+#else
 static __thread long return_address;
-/* avoid intercepting our function calls */
+#endif
+*/
+/* avoid intercepting our function calls
+#ifdef __APPLE__
+pthread_key_t no_intercept_key;
+#else
 static __thread int no_intercept;
+#endif
+*/
+
+long get_return_address();
+void set_return_address(long);
+long get_no_intercept();
+void set_no_intercept(long);
 
 /*
    avoid including the standard headers because the compiler will likely
@@ -130,9 +145,9 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 	return_code = 0; \
 	return_errno = 0; \
 	\
-	initial_no_intercept = no_intercept; \
-	if (0 == no_intercept && init_done /* don't hook open or write in the constructor */) { \
-		no_intercept = 1; /* allow all determine_action-called functions to pass-through */ \
+	initial_no_intercept = get_no_intercept(); \
+	if (0 == initial_no_intercept && init_done /* don't hook open or write in the constructor */) { \
+		set_no_intercept(1); /* allow all determine_action-called functions to pass-through */ \
 		determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, &call_original, &return_error, &return_code, &return_errno); \
 	} \
 	\
@@ -142,8 +157,8 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 			printf("Unable to get address for function %s\n", #FUNCTION_NAME); \
 	} \
 	\
-	no_intercept = initial_no_intercept; \
-	/* disabled - unlikely to be useful in practice */ \
+	set_no_intercept(initial_no_intercept); \
+	/* disabled - unlikely to be useful in practice  \
 	if (0 && call_original && return_error) \
 	{ \
 		/* save the original return value */ \
@@ -163,10 +178,10 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 		\
 		__asm__ ("ret" : : "a"(return_code)); \
 	} \
-	else if (return_error) \
+	else */ if (return_error) \
 	{ \
 		errno = return_errno; \
-		__asm__ ("nop" : : "a"(return_code)); \
+		__asm__ ("" : : "a"(return_code)); \
 		return; \
 	} \
 	else if (call_original) \
@@ -181,27 +196,42 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 	} \
 }
 
-/************************************************************************/
-/*	GENERATE_STUBv2_x64 - macro to generate stub functions on x64       */
-/*	UNSAFE: can present undefined behaviour when an exception is        */
-/*         encountered here or in any called function                   */
-/*	(but it's ok if an exception happens in the original function)      */
-/*	PROBLEM: the x64 ABI has a clear notion of function prologue and    */
-/*                                                   epilogue but...    */
-/*		we are using the stack to save/restore the initial state        */
-/*      (the one where we were called), i.e. register values,           */
-/*      outside the prologue/epilogue                                   */
-/*		http://msdn.microsoft.com/en-us/library/8ydc79k6(VS.80).aspx    */
-/*      TODO: write the entire function in assembly                     */
-/************************************************************************/
+struct reg_backup {
+	void* r15;
+	void* r14;
+	void* r13;
+	void* r12;
+	void* rdi;
+	void* rsi;
+	void* rbx;
+	void* rcx;
+	void* rdx;
+	void* r8;
+	void* r9;
+};
+	
+/***********************************************************************/
+/*    GENERATE_STUB_x64 - macro to generate stub functions on x64      */
+/*                        for Linux/MacOS x86_64                       */
+/***********************************************************************/
+#ifdef __APPLE__
+  #define GENERATE_STUB_x64(FUNCTION_NAME, SYMBOL_NAME) \
+  void FUNCTION_NAME (void) __asm__ ( "_" #SYMBOL_NAME ); \
+  FUNCTION_BODY_x64(FUNCTION_NAME, SYMBOL_NAME)
+#else
+  #define GENERATE_STUB_x64(FUNCTION_NAME, SYMBOL_NAME) \
+  void FUNCTION_NAME (void) __asm__ ( #SYMBOL_NAME ); \
+  FUNCTION_BODY_x64(FUNCTION_NAME, SYMBOL_NAME)
+#endif
 
-#define GENERATE_STUBv2_x64(FUNCTION_NAME) \
+#define FUNCTION_BODY_x64(FUNCTION_NAME, SYMBOL_NAME) \
 	void FUNCTION_NAME (void) \
 { \
 	int nptrs; \
 	void* buffer[TRACE_SIZE]; \
 	int call_original, return_error; \
 	int return_code, return_errno; \
+	reg_backup regs; \
 	static void * (*original_fn_ptr)(); \
 	/* we can't call write directly because it would prevent us for injecting faults in `write`
        (injecting requires the creation of a function with the same name but the prototype is
@@ -210,20 +240,31 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 	static int * (*original_write_ptr)(int, const void*, int); \
 	int initial_no_intercept; \
 	\
-	/* save non-volatiles */ \
-	__asm__ ("push %r15"); \
-	__asm__ ("push %r14"); \
-	__asm__ ("push %r13"); \
-	__asm__ ("push %r12"); \
-	__asm__ ("push %rdi"); \
-	__asm__ ("push %rsi"); \
-	__asm__ ("push %rbx"); \
+	register void *_r15 __asm__ ( "r15" ); \
+	register void *_r14 __asm__ ( "r14" ); \
+	register void *_r13 __asm__ ( "r13" ); \
+	register void *_r12 __asm__ ( "r12" ); \
+	register void *_rdi __asm__ ( "rdi" ); \
+	register void *_rsi __asm__ ( "rsi" ); \
+	register void *_rbx __asm__ ( "rbx" ); \
+	register void *_rcx __asm__ ( "rcx" ); \
+	register void *_rdx __asm__ ( "rdx" ); \
+	register void *_r8 __asm__ ( "r8" ); \
+	register void *_r9 __asm__ ( "r9" ); \
 	\
+	/* save non-volatiles */ \
+	regs.r15 = _r15; \
+	regs.r14 = _r14; \
+	regs.r13 = _r13; \
+	regs.r12 = _r12; \
+	regs.rbx = _rbx; \
 	/* save function arguments */ \
-	__asm__ ("push %rcx"); \
-	__asm__ ("push %rdx"); \
-	__asm__ ("push %r8"); \
-	__asm__ ("push %r9"); \
+	regs.rdi = _rdi; \
+	regs.rsi = _rsi; \
+	regs.rcx = _rcx; \
+	regs.rdx = _rdx; \
+	regs.r8 = _r8; \
+	regs.r9 = _r9; \
 	\
 	/* defaults */ \
 	call_original = 1; \
@@ -231,54 +272,48 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
 	return_code = 0; \
 	return_errno = 0; \
 	nptrs = 0; \
-	/* printf("intercepted %s\n", #FUNCTION_NAME); */\
+	/* printf("intercepted %s\n", #FUNCTION_NAME); */ \
 	\
-	initial_no_intercept = no_intercept; \
-	if (0 == no_intercept) { \
-		no_intercept = 1; \
-		determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, &call_original, &return_error, &return_code, &return_errno); \
+	if (init_done) { \
+		initial_no_intercept = get_no_intercept(); \
+		if (0 == initial_no_intercept) { \
+			set_no_intercept(1); \
+			determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, &call_original, &return_error, &return_code, &return_errno); \
+		} \
 	} \
         \
 	\
 	if(!original_fn_ptr) { \
-		original_fn_ptr = (void *(*)()) dlsym(RTLD_NEXT, #FUNCTION_NAME); \
+		original_fn_ptr = (void *(*)()) dlsym(RTLD_NEXT, #SYMBOL_NAME); \
 		if(!original_fn_ptr) \
-			printf("Unable to get address for function %s\n", #FUNCTION_NAME); \
+			printf("Unable to get address for function %s\n", #SYMBOL_NAME); \
 	} \
 	\
-	no_intercept = initial_no_intercept; \
+	if (init_done) \
+		set_no_intercept(initial_no_intercept); \
 	\
 	if (return_error) \
 	{ \
 		errno = return_errno; \
-		__asm__ ("nop" : : "a"(return_code)); \
-		/*__asm__ ("pop %rbx"); \
-		__asm__ ("pop %rsi"); \
-		__asm__ ("pop %rdi"); \
-		__asm__ ("pop %r12"); \
-		__asm__ ("pop %r13"); \
-		__asm__ ("pop %r14"); \
-		__asm__ ("pop %r15"); */ \
-		/* let the compiler-generated epilogue restore everything */ \
-		/* just clean up our pushes: 11pushes x 8bytes = 0x58 bytes */ \
-		__asm__ ("add $0x58, %rsp"); \
+		__asm__ ("" : : "a"(return_code)); \
 		return; \
 	} \
 	else if (call_original) \
 	{ \
 		/* restore function arguments */ \
-		__asm__ ("pop %r9"); \
-		__asm__ ("pop %r8"); \
-		__asm__ ("pop %rdx"); \
-		__asm__ ("pop %rcx"); \
+		__asm__ __volatile__ ("movq %0, %%r9" : : "m"(regs.r9)); \
+		__asm__ __volatile__ ("movq %0, %%r8" : : "m"(regs.r8)); \
+		__asm__ __volatile__ ("movq %0, %%rdx" : : "m"(regs.rdx)); \
+		__asm__ __volatile__ ("movq %0, %%rcx" : : "m"(regs.rcx)); \
 		/* restore non-volatiles */ \
-		__asm__ ("pop %rbx"); \
-		__asm__ ("pop %rsi"); \
-		__asm__ ("pop %rdi"); \
-		__asm__ ("pop %r12"); \
-		__asm__ ("pop %r13"); \
-		__asm__ ("pop %r14"); \
-		__asm__ ("pop %r15"); \
+		__asm__ __volatile__ ("movq %0, %%rbx" : : "m"(regs.rbx)); \
+		__asm__ __volatile__ ("movq %0, %%rsi" : : "m"(regs.rsi)); \
+		__asm__ __volatile__ ("movq %0, %%rdi" : : "m"(regs.rdi)); \
+		__asm__ __volatile__ ("movq %0, %%r12" : : "m"(regs.r12)); \
+		__asm__ __volatile__ ("movq %0, %%r13" : : "m"(regs.r13)); \
+		__asm__ __volatile__ ("movq %0, %%r14" : : "m"(regs.r14)); \
+		__asm__ __volatile__ ("movq %0, %%r15" : : "m"(regs.r15)); \
+		\
 		__asm__ ("leave"); \
 		__asm__ ("jmp *%%rax" : : "a"(original_fn_ptr)); \
 	} \

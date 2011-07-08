@@ -28,6 +28,9 @@
 #include <string.h>
 #include <execinfo.h>
 #include <iostream>
+#ifdef __APPLE__
+#include <pthread.h>
+#endif
 
 #ifdef __x86_64__
 	#define REG_BP	"rbp"
@@ -94,11 +97,18 @@ struct layout
   // void *args[8];
 };
 
+#ifdef __APPLE__
+void *__libc_stack_end;
+#else
 extern void *__libc_stack_end;
+#endif
 
 bool StateTrigger::Eval(const string&, ...)
 {
 	int i;
+#ifdef __APPLE__
+	__libc_stack_end = pthread_get_stackaddr_np(pthread_self());
+#endif
 	if (VAR_GLOBAL == var.location) {
 		if (VAR_INT == var.type) return (var.targetValue.targetInt == *(int*)var.offset);
 		return !strcmp(var.targetValue.targetString, (char*)var.offset);

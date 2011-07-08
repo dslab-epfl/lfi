@@ -33,5 +33,12 @@ public:
 	SemTrigger();
 	bool Eval(const string& functionName, ...);
 private:
-	static __thread int lockCount;
+	long get_lockCount();
+	void set_lockCount(long);
+#ifdef __APPLE__
+	static pthread_key_t lockCount_key;
+#else
+	static __thread long lockCount;
+#endif
+
 };

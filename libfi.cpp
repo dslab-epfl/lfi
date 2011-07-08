@@ -48,7 +48,11 @@
 using namespace std;
 
 #define STUBC	((char *) "intercept.stub.c")
+#ifdef __APPLE__
+#define STUBEX	((char *) "intercept.stub.dylib")
+#else
 #define STUBEX	((char *) "intercept.stub.so")
+#endif
 
 #define LOGFILE		"inject.log"
 #define	REPLAYFILE	"replay.xml"
@@ -58,16 +62,11 @@ using namespace std;
 #define FAILURE_METRIC		(int)1e6
 #define TIME_MULTIPLIER		1
 
-/*
-#ifdef __x86_64__
-	#error "x86_64 target not supported"
-#endif
-*/
 static void
 usage(char* me)
 {
     cout << "Usage: ";
-    cout << me << " <configurationFile> [-t <targetExecutable>]" << endl;
+    cout << me << " [-t <targetExecutable>] <configurationFile>" << endl;
 }
 
 static void
@@ -302,7 +301,7 @@ print_stubs(xmlNodeSetPtr nodes, ofstream& out)
 			xmlFree(functionName);
 		}
 	}
-	
+	ofstream symbols("symbols");
 	out << "extern \"C\" {" << endl;
 	set<string> generated_stubs;
 	for(i = 0; i < size; ++i)
@@ -315,13 +314,22 @@ print_stubs(xmlNodeSetPtr nodes, ofstream& out)
 			functionName = xmlGetProp(cur, (xmlChar*)"name");
 			if (functionName && generated_stubs.end() == generated_stubs.find((char*)functionName))
 			{
+				xmlChar* aliasName = xmlGetProp(cur, (xmlChar*)"alias");
 				out << "#ifdef __x86_64__" << endl;
-				out << "GENERATE_STUBv2_x64(" << (char*)functionName << ")" << endl;
+				if (aliasName) {
+					out << "GENERATE_STUB_x64(" << (char*)functionName << ", " << (char*)aliasName << ")" << endl;
+					symbols << "_" << aliasName << endl;
+				} else {
+					out << "GENERATE_STUB_x64(" << (char*)functionName << ", " << (char*)functionName << ")" << endl;
+					symbols << "_" << functionName << endl;
+				}
 				out << "#else" << endl;
 				out << "GENERATE_STUBv2(" << (char*)functionName << ")" << endl;
 				out << "#endif" << endl << endl;
 				generated_stubs.insert((char*)functionName);
 				xmlFree(functionName);
+				if (aliasName)
+					xmlFree(aliasName);
 			}
 		}
 	}
@@ -339,8 +347,11 @@ int compile_file(char* cfile, char* outfile)
 {
 	char cmd[1024];
 	int status;
+#ifdef __APPLE__
+	sprintf(cmd, "g++  -g -o %s %s inter.c Trigger.cpp triggers/*.cpp `xml2-config --cflags` `xml2-config --libs` -O0 -shared -Xlinker -exported_symbols_list -Xlinker symbols", outfile, cfile);
+#else
 	sprintf(cmd, "g++ -g -o %s %s inter.c Trigger.cpp triggers/*.cpp `xml2-config --cflags` `xml2-config --libs` -O0 -shared -fPIC -lrt -ldl", outfile, cfile);
-
+#endif
         // use the following line instead if you need debug information support (after installing libelf, libdwarf and the appropriate trigger)
         //sprintf(cmd, "g++ -g -o %s %s inter.c Trigger.cpp triggers/*.cpp `xml2-config --cflags` `xml2-config --libs` -O0 -shared -fPIC -lrt -ldl -ldwarf -lelf", outfile, cfile);
 
@@ -418,26 +429,33 @@ int generate_stub(char* config)
     return compile_file(STUBC, STUBEX);
 }
 
-/************************************************************************/
-/*	run_subject(int argc, char** argv,                                  */
-/*              char* preload_library, char *envp[])                    */
-/*                                                                      */
-/*	Runs subject program defined by (argc, argv[]) in the parent's      */
-/*        (our) environment + LD_PRELOAD                                */
-/*                                                                      */
-/*	Returns:                                                            */
-/*		-1 - failed to start program                                    */
-/*		0  - child program exited normally with a 0 return code         */
-/*		FAILURE_METRIC - child program exited normally with a non 0     */
-/*                                                     return code      */
-/*		CRASH_METRIC - child program was terminated by a signal         */
-/************************************************************************/
+/***************************************************************************/
+/*	run_subject(int argc, char** argv,                                 */
+/*              char* preload_library, char *envp[])                       */
+/*                                                                         */
+/*	Runs subject program defined by (argc, argv[]) in the parent's     */
+/*        (our) environment + LD_PRELOAD                                   */
+/*                                                                         */
+/*	Returns:                                                           */
+/*		-1 - failed to start program                               */
+/*		0  - child program exited normally with a 0 return code    */
+/*		FAILURE_METRIC - child program exited normally with a non 0  */
+/*                                                     return code         */
+/*		CRASH_METRIC - child program was terminated by a signal    */
+/***************************************************************************/
 int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 {
+#ifdef __APPLE__
+    char preload_path[1024] = "DYLD_INSERT_LIBRARIES=";
+#else
     char preload_path[1024] = "LD_PRELOAD=";
+#endif
+    char env_flat[] = "DYLD_FORCE_FLAT_NAMESPACE=";
     char **newenv, **newarg;
     int i, return_value;
 	int fd;
+    int loadvar_len = strlen(preload_path);
+
     pid_t monitor;
 	int status, exit_status, exit_signal;
 	struct timeval tvstart, tvend;
@@ -452,7 +470,7 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 		perror("shmat");
 	
 	return_value = CRASH_METRIC;
-    if (getcwd(&preload_path[11], sizeof(preload_path) - strlen(preload_library) - 12))
+    if (getcwd(&preload_path[loadvar_len], sizeof(preload_path) - strlen(preload_library) - loadvar_len - 1))
     {
         strcat(preload_path, "/");
         strcat(preload_path, preload_library);
@@ -460,9 +478,10 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 
         i = 0;
         while (envp[++i]);
-        newenv = (char**)malloc((i+2)*sizeof(char*));
+        newenv = (char**)malloc((i+3)*sizeof(char*));
         newenv[i] = &preload_path[0];
-        newenv[i+1] = NULL;
+	newenv[i+1] = &env_flat[0];
+        newenv[i+2] = NULL;
         for (--i; i >= 0; --i)
             newenv[i] = envp[i];
 
@@ -553,7 +572,6 @@ int main(int argc, char* argv[], char* envp[])
 	run_target = NULL;
 	
 	opterr = 0;
-
 	while ((c = getopt (argc, argv, "t:f:")) != -1)
 	{
 		switch (c)
@@ -577,14 +595,13 @@ int main(int argc, char* argv[], char* envp[])
 		  abort ();
 		}
 	}
-
 	if (optind >= argc)
 	{
 		usage(argv[0]);
 		return -1;
 	}
 
-	//++optind;
+	//++optind
 	run_argc = 0;
 	token = strtok(run_target, "\t ");
 	while (token)
@@ -596,7 +613,6 @@ int main(int argc, char* argv[], char* envp[])
 	LIBXML_TEST_VERSION
 	status = generate_stub(argv[optind]);
 	xmlCleanupParser();
-	
 	test_score = 0;
 	if (run_target) {
 		if (0 == status) {
