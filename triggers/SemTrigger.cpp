@@ -37,8 +37,10 @@ __thread long SemTrigger::lockCount = 0;
 
 SemTrigger::SemTrigger()
 {
+#ifdef __APPLE__
 	if (!lockCount_key)
 		pthread_key_create(&lockCount_key, NULL);
+#endif
 }
 
 long SemTrigger::get_lockCount()
