@@ -13,8 +13,16 @@ Example:
 
 See the online documentation at https://sourceforge.net/apps/trac/lfi/wiki/Documentation for details.
 
+Changelog:
+
+28 March 2013
+
+- Tested on Mountain Lion 10.8.3
+- Small fixes for Linux 64 bit.
+- Moved to GitHub.
+
 
 8 Jul 2011
-Implemented support for MacOS X (x86_64), tested on Snow Leopard 10.6.8
+- Implemented support for MacOS X (x86_64).
 
-MacOS function interception requires using a flat symbol namespace which means some applications will not work. Especially GUI applications are not suitable for testing via this interception approach.
+- MacOS function interception requires using a flat symbol namespace which means some applications will not work. Especially GUI applications are not suitable for testing via this interception approach.
