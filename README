@@ -16,6 +16,5 @@ See the online documentation at https://sourceforge.net/apps/trac/lfi/wiki/Docum
 
 8 Jul 2011
 Implemented support for MacOS X (x86_64), tested on Snow Leopard 10.6.8
-MacOS function interception requires using a flat symbol namespace which renders some applications
-unusable, i.e. not all (esp. GUI) applications are suitable for testing via this interception
-approach.
+
+MacOS function interception requires using a flat symbol namespace which means some applications will not work. Especially GUI applications are not suitable for testing via this interception approach.
