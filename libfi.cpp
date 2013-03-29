@@ -446,15 +446,19 @@ int generate_stub(char* config)
 int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 {
 #ifdef __APPLE__
-    char preload_path[1024] = "DYLD_INSERT_LIBRARIES=";
+    const char *preload = "DYLD_INSERT_LIBRARIES";
+    const char *apple_env_flat = "DYLD_FORCE_FLAT_NAMESPACE";
+    const char *apple_no_dyldcache = "DYLD_SHARED_REGION";
+    /* this needs to be specified explictly in the flat namespace */
+    const char *apple_explicit_libs = "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/ATS.framework/Versions/A/Resources/libFontRegistry.dylib";
 #else
-    char preload_path[1024] = "LD_PRELOAD=";
+    const char *preload = "LD_PRELOAD";
 #endif
-    char env_flat[] = "DYLD_FORCE_FLAT_NAMESPACE=";
-    char **newenv, **newarg;
+    char preload_path[1024];
+
+    char **newarg;
     int i, return_value;
 	int fd;
-    int loadvar_len = strlen(preload_path);
 
     pid_t monitor;
 	int status, exit_status, exit_signal;
@@ -470,20 +474,15 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 		perror("shmat");
 	
 	return_value = CRASH_METRIC;
-    if (getcwd(&preload_path[loadvar_len], sizeof(preload_path) - strlen(preload_library) - loadvar_len - 1))
+    if (getcwd(preload_path, sizeof(preload_path) - strlen(preload_library) - 1))
     {
         strcat(preload_path, "/");
         strcat(preload_path, preload_library);
-        cerr << preload_path << endl;
-
-        i = 0;
-        while (envp[++i]);
-        newenv = (char**)malloc((i+3)*sizeof(char*));
-        newenv[i] = &preload_path[0];
-	newenv[i+1] = &env_flat[0];
-        newenv[i+2] = NULL;
-        for (--i; i >= 0; --i)
-            newenv[i] = envp[i];
+#if __APPLE__
+        strlcat(preload_path, ":", sizeof(preload_path));
+        strlcat(preload_path, apple_explicit_libs, sizeof(preload_path));
+#endif
+        cerr << "[LFI] Preloading " << preload_path << endl;
 
         newarg = (char**)malloc((argc+1)*sizeof(char*));
 		for (i = 0; i < argc; ++i)
@@ -493,7 +492,12 @@ int run_subject(int argc, char** argv, char* preload_library, char *envp[])
 	gettimeofday(&tvstart, NULL);
         if (0 == (monitor = fork()))
         {
-            execve(argv[0], newarg, newenv);
+#ifdef __APPLE__
+            setenv(apple_env_flat, "", 1);
+            setenv(apple_no_dyldcache, "avoid", 1);
+#endif
+            setenv(preload, preload_path, 1);
+            execv(argv[0], newarg);
 			*runstatus = 1;
 			shmdt(runstatus);
 			_exit(0);

@@ -15,6 +15,11 @@ See the online documentation at https://sourceforge.net/apps/trac/lfi/wiki/Docum
 
 Changelog:
 
+29 March 2013
+- Improved support for MacOS
+- Added generic MacOS scenario usable on Safari, Calendar, etc. Example:
+./libfi -t /Applications/Safari.app/Contents/MacOS/Safari scenarios/macos.simple.xml
+
 28 March 2013
 
 - Tested on Mountain Lion 10.8.3

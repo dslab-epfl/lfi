@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plan>
+  <!--
+    Generic proof-of-concept plan for MacOS (x86_64)
+    Most Mac applications (e.g. Safari, iCal) malfunction and/or crash
+    when subject to these faults.
+    This can be significantly improved with stack-based triggers
+  -->
+  <trigger id="1sec" class="TimerTrigger">
+    <args><wait>1</wait></args>
+  </trigger>
+
+  <trigger id="random" class="RandomTrigger">
+    <args>
+      <percent>20</percent>
+    </args>
+  </trigger>
+
+  <function name="open" retval="-1" errno="ENFILE">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+
+  <function name="readlink" retval="-1" errno="EIO">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+
+  <function name="opendir" alias="opendir$INODE64" retval="0" errno="ENOMEM">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+  
+  <function name="send" retval="-1" errno="ENOBUFS">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+
+  <function name="fstat" retval="-1" errno="EIO">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+  <function name="lstat" retval="-1" errno="ENOENT">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+	
+  <function name="pipe" retval="-1" errno="ENFILE">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+  
+  <function name="popen" retval="0" errno="ENOMEM">
+    <triggerx ref="1sec" />
+    <triggerx ref="random" />
+  </function>
+
+</plan>
