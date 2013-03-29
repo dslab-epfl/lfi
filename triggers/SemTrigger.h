@@ -30,15 +30,15 @@
 DEFINE_TRIGGER( SemTrigger )
 {
 public:
-	SemTrigger();
-	bool Eval(const string& functionName, ...);
+  SemTrigger();
+  bool Eval(const string& functionName, ...);
 private:
-	long get_lockCount();
-	void set_lockCount(long);
+  long get_lockCount();
+  void set_lockCount(long);
 #ifdef __APPLE__
-	static pthread_key_t lockCount_key;
+  static pthread_key_t lockCount_key;
 #else
-	static __thread long lockCount;
+  static __thread long lockCount;
 #endif
 
 };

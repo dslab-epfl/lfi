@@ -35,8 +35,8 @@ using namespace std;
 class Trigger
 {
 public:
-	virtual void Init(xmlNodePtr initData) {}
-	virtual bool Eval(const string& functionName, ...) = 0;
+  virtual void Init(xmlNodePtr initData) {}
+  virtual bool Eval(const string& functionName, ...) = 0;
 };
 
 typedef Trigger* (*FactoryMethod)() ;
@@ -46,53 +46,53 @@ class RegEntry ;
 class Class
 {
 public :
-    static Class forName( std::string s )
-    {
-		return( Class( s ) ) ;
-    }
-    Trigger* newInstance() ;
-	
-	static Trigger* newI(std::string s)
-	{
-		return (Class(s).newInstance());
-	}
+  static Class forName( std::string s )
+  {
+    return( Class( s ) ) ;
+  }
+  Trigger* newInstance() ;
+
+  static Trigger* newI(std::string s)
+  {
+    return (Class(s).newInstance());
+  }
 private :
-	std::string name ;
-	typedef std::map< std::string, FactoryMethod > FactoryMethodMap ;
-	static FactoryMethodMap* fmMap ;
-	friend class RegEntry ;
-	static void Register( std::string s, FactoryMethod m ) ;
-	Class( std::string s ) : name( s ) 
-    {
-    }
+  std::string name ;
+  typedef std::map< std::string, FactoryMethod > FactoryMethodMap ;
+  static FactoryMethodMap* fmMap ;
+  friend class RegEntry ;
+  static void Register( std::string s, FactoryMethod m ) ;
+  Class( std::string s ) : name( s ) 
+  {
+  }
 };
 
 
 class RegEntry 
 {
 public :
-	RegEntry( const char s[], FactoryMethod f ) 
-	{ 
-		Class::Register( s, f ) ;
-	}
+  RegEntry( const char s[], FactoryMethod f ) 
+  { 
+    Class::Register( s, f ) ;
+  }
 };
 
 
 template< class T, const char S[] > class Registered
+{
+public :
+  static Trigger* newInstance() 
   {
-  public :
-    static Trigger* newInstance() 
-      {
-      return( new T() ) ;
-      }
-  protected :
-    Registered()
-      {
-      const RegEntry& dummy = r ;
-      }
-  private :
-    static const RegEntry r ;
-  } ;
+    return( new T() ) ;
+  }
+protected :
+  Registered()
+  {
+    const RegEntry& dummy = r ;
+  }
+private :
+  static const RegEntry r ;
+} ;
 
 template< class T, const char S[] > const RegEntry 
 Registered< T, S > :: r = RegEntry( S, Registered< T, S >::newInstance ) ;

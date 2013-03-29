@@ -28,37 +28,37 @@
 #include <iostream>
 
 CallCountTrigger::CallCountTrigger()
-	: callCount(0)
+  : callCount(0)
 {
 }
 
 void CallCountTrigger::Init(xmlNodePtr initData)
 {
-	xmlNodePtr nodeElement, textElement;
+  xmlNodePtr nodeElement, textElement;
 
-	nodeElement = initData->children;
-	while (nodeElement)
-	{
-		if (XML_ELEMENT_NODE == nodeElement->type &&
-			!xmlStrcmp(nodeElement->name, (const xmlChar*)"callcount"))
-		{
-			textElement = nodeElement->children;
-			if (XML_TEXT_NODE == textElement->type)
-				callCounts.push_back(atoi((char*)textElement->content));
-		}
-		nodeElement = nodeElement->next;
-	}
+  nodeElement = initData->children;
+  while (nodeElement)
+  {
+    if (XML_ELEMENT_NODE == nodeElement->type &&
+      !xmlStrcmp(nodeElement->name, (const xmlChar*)"callcount"))
+    {
+      textElement = nodeElement->children;
+      if (XML_TEXT_NODE == textElement->type)
+        callCounts.push_back(atoi((char*)textElement->content));
+    }
+    nodeElement = nodeElement->next;
+  }
 }
 
 bool CallCountTrigger::Eval(const string&, ...)
 {
-	++callCount;
-	// binary search? not useful for a reasonably small number of call counts
-	for (vector<int>::iterator it = callCounts.begin(), itend = callCounts.end(); it != itend; ++it)
-	{
-		if (callCount == *it) {
-			return true;
-		}
-	}
-	return false;
+  ++callCount;
+  // binary search? not useful for a reasonably small number of call counts
+  for (vector<int>::iterator it = callCounts.begin(), itend = callCounts.end(); it != itend; ++it)
+  {
+    if (callCount == *it) {
+      return true;
+    }
+  }
+  return false;
 }

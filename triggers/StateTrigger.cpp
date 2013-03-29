@@ -33,61 +33,61 @@
 #endif
 
 #ifdef __x86_64__
-	#define REG_BP	"rbp"
+  #define REG_BP  "rbp"
 #else
-	#define REG_BP "ebp"
+  #define REG_BP "ebp"
 #endif
 
 using namespace std;
 void StateTrigger::Init(xmlNodePtr initData)
 {
-	xmlNodePtr nodeElement, nodeElementLvl2, textElement;
+  xmlNodePtr nodeElement, nodeElementLvl2, textElement;
 
-	nodeElement = initData->children;
-	while (nodeElement)
-	{
-		if (XML_ELEMENT_NODE == nodeElement->type &&
-		    (!xmlStrcmp(nodeElement->name, (const xmlChar*)"local") || !xmlStrcmp(nodeElement->name, (const xmlChar*)"global")))
-		{
-			var.offset = 0;
-			var.frame = 1;
-			var.location = (!xmlStrcmp(nodeElement->name, (const xmlChar*)"local") ? VAR_LOCAL : VAR_GLOBAL );
+  nodeElement = initData->children;
+  while (nodeElement)
+  {
+    if (XML_ELEMENT_NODE == nodeElement->type &&
+        (!xmlStrcmp(nodeElement->name, (const xmlChar*)"local") || !xmlStrcmp(nodeElement->name, (const xmlChar*)"global")))
+    {
+      var.offset = 0;
+      var.frame = 1;
+      var.location = (!xmlStrcmp(nodeElement->name, (const xmlChar*)"local") ? VAR_LOCAL : VAR_GLOBAL );
 
-			nodeElementLvl2 = nodeElement->children;
-			while (nodeElementLvl2)
-			{
-				textElement = nodeElementLvl2->children;
-				if (textElement && XML_TEXT_NODE == textElement->type)
-				{
-					if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"offset"))
-						var.offset = (char*)strtoul((char*)textElement->content, NULL, 0);
-					else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"type")) {
-						if (!xmlStrcmp(textElement->content, (const xmlChar*)"int")) {
-						  var.type = VAR_INT;
-						} else if (!xmlStrcmp(textElement->content, (const xmlChar*)"string")) {
-						  var.type = VAR_STRING;
-						} else {
-						  cerr << "[StateTrigger] Unknown variable type: " << (char*)nodeElementLvl2->content << endl;
-						}
-					} else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"value")) {
-						if (VAR_INT == var.type)
-						  var.targetValue.targetInt = atoi((char*)textElement->content);
-						else if (VAR_STRING == var.type) {
-						  // XXX - check string size
-						  strcpy(var.targetValue.targetString, (char*)textElement->content);
-						}
-					} else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"frame")) {
-						  var.frame = atoi((char*)textElement->content);
-					} else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"value")) {
-					        var.frame = atoi((char*)textElement->content);
-					}
-				}
-				nodeElementLvl2 = nodeElementLvl2->next;
-			}
-			break;
-		}
-		nodeElement = nodeElement->next;
-	}
+      nodeElementLvl2 = nodeElement->children;
+      while (nodeElementLvl2)
+      {
+        textElement = nodeElementLvl2->children;
+        if (textElement && XML_TEXT_NODE == textElement->type)
+        {
+          if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"offset"))
+            var.offset = (char*)strtoul((char*)textElement->content, NULL, 0);
+          else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"type")) {
+            if (!xmlStrcmp(textElement->content, (const xmlChar*)"int")) {
+              var.type = VAR_INT;
+            } else if (!xmlStrcmp(textElement->content, (const xmlChar*)"string")) {
+              var.type = VAR_STRING;
+            } else {
+              cerr << "[StateTrigger] Unknown variable type: " << (char*)nodeElementLvl2->content << endl;
+            }
+          } else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"value")) {
+            if (VAR_INT == var.type)
+              var.targetValue.targetInt = atoi((char*)textElement->content);
+            else if (VAR_STRING == var.type) {
+              // XXX - check string size
+              strcpy(var.targetValue.targetString, (char*)textElement->content);
+            }
+          } else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"frame")) {
+            var.frame = atoi((char*)textElement->content);
+          } else if (!xmlStrcmp(nodeElementLvl2->name, (const xmlChar*)"value")) {
+            var.frame = atoi((char*)textElement->content);
+          }
+        }
+        nodeElementLvl2 = nodeElementLvl2->next;
+      }
+      break;
+    }
+    nodeElement = nodeElement->next;
+  }
 }
 
 struct layout
@@ -105,31 +105,31 @@ extern void *__libc_stack_end;
 
 bool StateTrigger::Eval(const string&, ...)
 {
-	int i;
+  int i;
 #ifdef __APPLE__
-	__libc_stack_end = pthread_get_stackaddr_np(pthread_self());
+  __libc_stack_end = pthread_get_stackaddr_np(pthread_self());
 #endif
-	if (VAR_GLOBAL == var.location) {
-		if (VAR_INT == var.type) return (var.targetValue.targetInt == *(int*)var.offset);
-		return !strcmp(var.targetValue.targetString, (char*)var.offset);
-	}
+  if (VAR_GLOBAL == var.location) {
+    if (VAR_INT == var.type) return (var.targetValue.targetInt == *(int*)var.offset);
+    return !strcmp(var.targetValue.targetString, (char*)var.offset);
+  }
 
-	register void *bpx __asm__ ( REG_BP );
+  register void *bpx __asm__ ( REG_BP );
 
-	struct layout *bp = (struct layout *)bpx;
-	
-	for (i = (int)var.frame+2; i; --i) {
-		if ((void*)bp > __libc_stack_end || ((long)bp & 3))
-			return false;
-		bp = bp->bp;
-	}
-	if (VAR_INT == var.type) { 
-		if (var.targetValue.targetInt == *(int*)((char*)bp + (long)var.offset))
-			return true;
-		return false;
-	}
-	char* target = *(char**)((char*)(bp) + (long)var.offset);
-	if (!strcmp(var.targetValue.targetString, target))
-		return true;
-	return false;
+  struct layout *bp = (struct layout *)bpx;
+
+  for (i = (int)var.frame+2; i; --i) {
+    if ((void*)bp > __libc_stack_end || ((long)bp & 3))
+      return false;
+    bp = bp->bp;
+  }
+  if (VAR_INT == var.type) { 
+    if (var.targetValue.targetInt == *(int*)((char*)bp + (long)var.offset))
+      return true;
+    return false;
+  }
+  char* target = *(char**)((char*)(bp) + (long)var.offset);
+  if (!strcmp(var.targetValue.targetString, target))
+    return true;
+  return false;
 }

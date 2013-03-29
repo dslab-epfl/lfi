@@ -29,8 +29,8 @@
 DEFINE_TRIGGER( SingleTrigger )
 {
 public:
-	SingleTrigger();
-	bool Eval(const string& functionName, ...);
+  SingleTrigger();
+  bool Eval(const string& functionName, ...);
 private:
-	unsigned int triggered;
+  unsigned int triggered;
 };

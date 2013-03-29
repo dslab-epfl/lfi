@@ -29,6 +29,6 @@
 DEFINE_TRIGGER( ReadInspector )
 {
 public:
-	ReadInspector();
-	bool Eval(const string& functionName, ...);
+  ReadInspector();
+  bool Eval(const string& functionName, ...);
 };

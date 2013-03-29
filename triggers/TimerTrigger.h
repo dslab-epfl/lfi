@@ -29,18 +29,18 @@
 class StartTime
 {
 public:
-	StartTime();
-	unsigned int st_time;
+  StartTime();
+  unsigned int st_time;
 };
 
 DEFINE_TRIGGER( TimerTrigger )
 {
 public:
-	TimerTrigger();
-	void Init(xmlNodePtr initData);
-	bool Eval(const string& functionName, ...);
+  TimerTrigger();
+  void Init(xmlNodePtr initData);
+  bool Eval(const string& functionName, ...);
 private:
-	int wait;
-	int go;
-	static StartTime start;
+  int wait;
+  int go;
+  static StartTime start;
 };

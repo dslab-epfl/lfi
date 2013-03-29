@@ -33,39 +33,39 @@
 unsigned int RandomTrigger::seed = 0;
 
 RandomTrigger::RandomTrigger()
-	: probability(0)
+  : probability(0)
 {
 }
 
 void RandomTrigger::Init(xmlNodePtr initData)
 {
-	xmlNodePtr nodeElement, textElement;
-	time_t t;
-	const char* seedFile = "rndtrigger.seed";
+  xmlNodePtr nodeElement, textElement;
+  time_t t;
+  const char* seedFile = "rndtrigger.seed";
 
-	nodeElement = initData->children;
-	while (nodeElement)
-	{
-		if (XML_ELEMENT_NODE == nodeElement->type &&
-			!xmlStrcmp(nodeElement->name, (const xmlChar*)"percent"))
-		{
-			textElement = nodeElement->children;
-			if (XML_TEXT_NODE == textElement->type)
-				probability = atoi((char*)textElement->content);
-		}
-		nodeElement = nodeElement->next;
-	}
-	
-	if (!seed)
-	{
-		seed = (unsigned)time(&t);
-		srand(seed);
-	}
+  nodeElement = initData->children;
+  while (nodeElement)
+  {
+    if (XML_ELEMENT_NODE == nodeElement->type &&
+      !xmlStrcmp(nodeElement->name, (const xmlChar*)"percent"))
+    {
+      textElement = nodeElement->children;
+      if (XML_TEXT_NODE == textElement->type)
+        probability = atoi((char*)textElement->content);
+    }
+    nodeElement = nodeElement->next;
+  }
+  
+  if (!seed)
+  {
+    seed = (unsigned)time(&t);
+    srand(seed);
+  }
 }
 
 bool RandomTrigger::Eval(const string& fn, ...)
 {
-	if (rand() % 100 < probability)
-		return true;
-	return false;
+  if (rand() % 100 < probability)
+    return true;
+  return false;
 }

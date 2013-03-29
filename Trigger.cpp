@@ -32,22 +32,22 @@ Class :: FactoryMethodMap* Class :: fmMap ;
 
 Trigger* Class :: newInstance()
 {
-	/*
-		if intercepting functions called by static initializers/global
-		variables constructors, the class may not be yet registered
-    */
-	if (NULL == fmMap)
-		return NULL;
-	FactoryMethodMap::iterator it = fmMap->find( name ) ;
-	if( it != fmMap->end() )
-		return( it->second() ) ;
-	else
-		return( NULL ) ;
+  /*
+    if intercepting functions called by static initializers/global
+    variables constructors, the class may not be yet registered
+  */
+  if (NULL == fmMap)
+    return NULL;
+  FactoryMethodMap::iterator it = fmMap->find( name ) ;
+  if( it != fmMap->end() )
+    return( it->second() ) ;
+  else
+    return( NULL ) ;
  }
 
 void Class :: Register( std::string s, FactoryMethod m )
 {
-	if( fmMap == NULL )
-		fmMap = new std::map< std::string, FactoryMethod > ;
-	fmMap->insert( std::pair< std::string, FactoryMethod >( s, m ) ) ;
+  if( fmMap == NULL )
+    fmMap = new std::map< std::string, FactoryMethod > ;
+  fmMap->insert( std::pair< std::string, FactoryMethod >( s, m ) ) ;
 }

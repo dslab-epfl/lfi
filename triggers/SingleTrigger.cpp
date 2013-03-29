@@ -29,15 +29,15 @@
 
 SingleTrigger::SingleTrigger()
 {
-	triggered = 0;
+  triggered = 0;
 }
 
 bool SingleTrigger::Eval(const string&, ...)
 {
-	if (triggered) {
-		return false;
-	}
+  if (triggered) {
+    return false;
+  }
 
-	triggered = 1;
-	return true;
+  triggered = 1;
+  return true;
 }

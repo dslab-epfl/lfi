@@ -34,17 +34,17 @@ ReadInspector::ReadInspector()
 
 bool ReadInspector::Eval(const string& functionName, ...)
 {
-	/* only intended to be used when intercepting the read function */
-	va_list ap;
-	int fd;
-	size_t size;
+  /* only intended to be used when intercepting the read function */
+  va_list ap;
+  int fd;
+  size_t size;
 
-	va_start(ap, functionName);
-	fd = va_arg(ap, int);
-	va_arg(ap, void*);
-	size = va_arg(ap, size_t);
-	va_end(ap);
+  va_start(ap, functionName);
+  fd = va_arg(ap, int);
+  va_arg(ap, void*);
+  size = va_arg(ap, size_t);
+  va_end(ap);
 
-	/* inject only when reading 1024 bytes from stdin */
-	return (fd == 0 && size == 1024);
+  /* inject only when reading 1024 bytes from stdin */
+  return (fd == 0 && size == 1024);
 }

@@ -9,10 +9,10 @@
 DEFINE_TRIGGER( NetInspector )
 {
 public:
-	NetInspector();
-	bool Eval(const string& functionName, ...);
+  NetInspector();
+  bool Eval(const string& functionName, ...);
 private:
-	int sockfd;	
-	char buffer[256];
-	char receiveBuf[10];
+  int sockfd;  
+  char buffer[256];
+  char receiveBuf[10];
 };

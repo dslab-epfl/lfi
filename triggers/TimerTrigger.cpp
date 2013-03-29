@@ -31,44 +31,44 @@ StartTime TimerTrigger::start;
 
 StartTime::StartTime()
 {
-	st_time = (unsigned)time(NULL);
+  st_time = (unsigned)time(NULL);
 }
 
 TimerTrigger::TimerTrigger()
-	: wait(0)
-	, go(0)
+  : wait(0)
+  , go(0)
 {
 }
 
 void TimerTrigger::Init(xmlNodePtr initData)
 {
-	xmlNodePtr nodeElement, textElement;
+  xmlNodePtr nodeElement, textElement;
 
-	nodeElement = initData->children;
-	while (nodeElement)
-	{
-		if (XML_ELEMENT_NODE == nodeElement->type &&
-			!xmlStrcmp(nodeElement->name, (const xmlChar*)"wait"))
-		{
-			textElement = nodeElement->children;
-			if (XML_TEXT_NODE == textElement->type)
-				wait = atoi((char*)textElement->content);
-		}
-		nodeElement = nodeElement->next;
-	}
+  nodeElement = initData->children;
+  while (nodeElement)
+  {
+    if (XML_ELEMENT_NODE == nodeElement->type &&
+        !xmlStrcmp(nodeElement->name, (const xmlChar*)"wait"))
+    {
+      textElement = nodeElement->children;
+      if (XML_TEXT_NODE == textElement->type)
+        wait = atoi((char*)textElement->content);
+    }
+    nodeElement = nodeElement->next;
+  }
 }
 
 bool TimerTrigger::Eval(const string&, ...)
 {
-	if (go)
-		return true;
-	
-	if ((unsigned)time(NULL) - start.st_time >= wait) {
-		go = 1;
-	}
-	
-	if (go)
-		return true;
+  if (go)
+    return true;
 
-	return false;
+  if ((unsigned)time(NULL) - start.st_time >= wait) {
+    go = 1;
+  }
+
+  if (go)
+    return true;
+
+  return false;
 }

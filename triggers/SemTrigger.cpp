@@ -38,46 +38,46 @@ __thread long SemTrigger::lockCount = 0;
 SemTrigger::SemTrigger()
 {
 #ifdef __APPLE__
-	if (!lockCount_key)
-		pthread_key_create(&lockCount_key, NULL);
+  if (!lockCount_key)
+    pthread_key_create(&lockCount_key, NULL);
 #endif
 }
 
 long SemTrigger::get_lockCount()
 {
 #ifdef __APPLE__
-	return (long)pthread_getspecific(lockCount_key);
+  return (long)pthread_getspecific(lockCount_key);
 #else
-	return lockCount;
+  return lockCount;
 #endif
 }
 
 void SemTrigger::set_lockCount(long v)
 {
 #ifdef __APPLE__
-	pthread_setspecific(lockCount_key, (void*)v);
+  pthread_setspecific(lockCount_key, (void*)v);
 #else
-	lockCount = v;
+  lockCount = v;
 #endif
 }
 
 
 bool SemTrigger::Eval(const string& functionName, ...)
 {
-	long l;
-	if (functionName == "pthread_mutex_lock")
-	{
-		set_lockCount(get_lockCount()+1);
-	}
-	else if (functionName == "pthread_mutex_unlock")
-	{
-		if (l = get_lockCount()) // sanity check
-			set_lockCount(l - 1);
-	}
-	else
-	{
-		if (get_lockCount() > 0)
-			return true;
-	}
-	return false;
+  long l;
+  if (functionName == "pthread_mutex_lock")
+  {
+    set_lockCount(get_lockCount()+1);
+  }
+  else if (functionName == "pthread_mutex_unlock")
+  {
+    if (l = get_lockCount()) // sanity check
+      set_lockCount(l - 1);
+  }
+  else
+  {
+    if (get_lockCount() > 0)
+      return true;
+  }
+  return false;
 }

@@ -31,27 +31,27 @@ enum VarLocation { VAR_GLOBAL, VAR_LOCAL };
 
 struct Variable
 {
-	VarType type;
-	VarLocation location;
-	void* offset;
-	int frame;
-	union {
-	  int targetInt;
-	  char targetString[128];
-        } targetValue;
+  VarType type;
+  VarLocation location;
+  void* offset;
+  int frame;
+  union {
+    int targetInt;
+    char targetString[128];
+  } targetValue;
 
-	bool resolved; /* unused */
-	string module; /* unused */
-	string fileName; /* unused */
-	int lineNumber;  /* unused */
+  bool resolved; /* unused */
+  string module; /* unused */
+  string fileName; /* unused */
+  int lineNumber;  /* unused */
 };
 
 DEFINE_TRIGGER( StateTrigger )
 {
 public:
-	StateTrigger() { };
-	void Init(xmlNodePtr initData);
-	bool Eval(const string& functionName, ...);
+  StateTrigger() { };
+  void Init(xmlNodePtr initData);
+  bool Eval(const string& functionName, ...);
 private:
-	Variable var;
+  Variable var;
 };

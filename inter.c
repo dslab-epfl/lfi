@@ -39,9 +39,9 @@
 
 
 #ifdef __x86_64__
-	#define REG_BP	"rbp"
+  #define REG_BP  "rbp"
 #else
-	#define REG_BP "ebp"
+  #define REG_BP "ebp"
 #endif
 
 /*
@@ -76,91 +76,91 @@ uint64_t tsc() {
 void lfi_segv_handler(int, siginfo_t *, void *)
 {
 #ifdef WITH_LOGS
-	struct timespec t = {0, 0};
-	char message[256];
+  struct timespec t = {0, 0};
+  char message[256];
 
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
 
-	sprintf(message, "[ %lld %ld %ld] SIGSEGV received\n", tsc(), (long)t.tv_sec, t.tv_nsec);
-	write(log_fd, message, strlen(message));
-	fdatasync(log_fd);
+  sprintf(message, "[ %lld %ld %ld] SIGSEGV received\n", tsc(), (long)t.tv_sec, t.tv_nsec);
+  write(log_fd, message, strlen(message));
+  fdatasync(log_fd);
 #endif
-	abort();
+  abort();
 }
 
 void __attribute__ ((constructor)) 
 my_init(void)
 {
 #ifdef WITH_LOGS
-	log_fd = open(LOGFILE, 577, 0644);
-	replay_fd = open(REPLAYFILE, 577, 0644);
+  log_fd = open(LOGFILE, 577, 0644);
+  replay_fd = open(REPLAYFILE, 577, 0644);
 
-	write(replay_fd, "<plan>\n", 7);
+  write(replay_fd, "<plan>\n", 7);
 #endif
 #ifdef WITH_SIGHANDLER
-	struct sigaction sa;
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = lfi_segv_handler;
-	sigaction(SIGSEGV, &sa, NULL);
+  struct sigaction sa;
+  memset(&sa, 0, sizeof(sa));
+  sa.sa_flags = SA_SIGINFO;
+  sa.sa_sigaction = lfi_segv_handler;
+  sigaction(SIGSEGV, &sa, NULL);
 #endif
 #ifdef __APPLE__
-	int err;
-	err = pthread_key_create(&return_address_key, NULL);
-	err |= pthread_key_create(&no_intercept_key, NULL);
-	if (err)
-		write(2, "Failed to create thread keys\n", 29);
+  int err;
+  err = pthread_key_create(&return_address_key, NULL);
+  err |= pthread_key_create(&no_intercept_key, NULL);
+  if (err)
+    write(2, "Failed to create thread keys\n", 29);
 #endif
-	init_done = 1;
+  init_done = 1;
 }
 
 void __attribute__ ((destructor))
 my_fini(void)
 {
 #ifdef WITH_LOGS
-	write(replay_fd, "</plan>\n", 8);
-	close(replay_fd);
-	close(log_fd);
+  write(replay_fd, "</plan>\n", 8);
+  close(replay_fd);
+  close(log_fd);
 #endif
 }
 
 long get_return_address()
 {
-	long r;
+  long r;
 #ifdef __APPLE__
-	r = (long)pthread_getspecific(return_address_key);
+  r = (long)pthread_getspecific(return_address_key);
 #else
-	r = return_address;
+  r = return_address;
 #endif
-	return r;
+  return r;
 }
 
 long get_no_intercept()
 {
-	long r;
+  long r;
 #ifdef __APPLE__
-	r = (long)pthread_getspecific(no_intercept_key);
+  r = (long)pthread_getspecific(no_intercept_key);
 #else
-	r = no_intercept;
+  r = no_intercept;
 #endif
-	return r;
+  return r;
 }
 
 void set_return_address(long value)
 {
 #ifdef __APPLE__
-	pthread_setspecific(return_address_key, (void*)value);
+  pthread_setspecific(return_address_key, (void*)value);
 #else
-	return_address = value;
+  return_address = value;
 #endif
 }
 
 void set_no_intercept(long value)
 {
 #ifdef __APPLE__
-	pthread_setspecific(no_intercept_key, (void*)value);
+  pthread_setspecific(no_intercept_key, (void*)value);
 #else
-	no_intercept = value;
+  no_intercept = value;
 #endif
 }
 
@@ -170,150 +170,149 @@ void set_no_intercept(long value)
 /* associated with the function fn when running an injection scenario   */
 /************************************************************************/
 void determine_action(struct fninfov2 fn_details[],
-						  __in const char* function_name,
-						  __out int* call_original,
-						  __out int* return_error,
-						  __out int* return_code,
-						  __out int* return_errno)
+              __in const char* function_name,
+              __out int* call_original,
+              __out int* return_error,
+              __out int* return_code,
+              __out int* return_errno)
 {
-	int err_index, i, j;
-	bool ev;
-	char message[256];
-	static long c;
+  int err_index, i, j;
+  bool ev;
+  char message[256];
+  static long c;
 
-	xmlDocPtr initDataDoc;
-	xmlNodePtr initData;
+  xmlDocPtr initDataDoc;
+  xmlNodePtr initData;
 
-	*call_original = 1;
-	*return_error = 0;
-	*return_code = 0;
-	*return_errno = 0;
-	TriggerDesc **triggers;
-	
-	/*
-		you can think of the triggers for a function as a jagged array - fn_details[].triggers[]
-		if all the triggers on one line (fn_details[i]) of the array evaluate to true,
-		the error associated with that line is injected
-	*/
-	for (i = 0; fn_details[i].function_name[0]; ++i)
-	{
-		triggers = fn_details[i].triggers;
-		// if no triggers are defined the default behavior is to inject
-		ev = true;
-		for (j = 0; triggers[j]; ++j) {
-			/*
-			c++;
-			if (0 == c % 100000)
-				printf("%d funcs\n", c);
-			*/
-			
-			if (!triggers[j]->trigger)
-			{
-				/* TODO: make operation atomic i.e. never instantiate twice */
-				triggers[j]->trigger = Class::newI(triggers[j]->tclass);
+  *call_original = 1;
+  *return_error = 0;
+  *return_code = 0;
+  *return_errno = 0;
+  TriggerDesc **triggers;
 
-				if (!triggers[j]->trigger)
-				{
-					printf( "Trigger class %s not found or not yet registered while intercepting %s\n",
-						triggers[j]->tclass, fn_details[i].function_name);
-					return;
-				}
-				else
-				{
-					if (triggers[j]->init[0])
-					{
-						initDataDoc = xmlParseDoc((xmlChar*)triggers[j]->init);
+  /*
+     you can think of the triggers for a function as a jagged array - fn_details[].triggers[]
+     if all the triggers on one line (fn_details[i]) of the array evaluate to true,
+     the error associated with that line is injected
+     */
+  for (i = 0; fn_details[i].function_name[0]; ++i)
+  {
+    triggers = fn_details[i].triggers;
+    // if no triggers are defined the default behavior is to inject
+    ev = true;
+    for (j = 0; triggers[j]; ++j) {
+      /*
+         c++;
+         if (0 == c % 100000)
+         printf("%d funcs\n", c);
+         */
 
-						if (initDataDoc)
-							initData = xmlDocGetRootElement(initDataDoc);
-					} else {
-						initData = NULL;
-					}
-					triggers[j]->trigger->Init(initData);
-				}
-			}
+      if (!triggers[j]->trigger)
+      {
+        /* TODO: make operation atomic i.e. never instantiate twice */
+        triggers[j]->trigger = Class::newI(triggers[j]->tclass);
 
-			register void* _ebp __asm__( REG_BP );
-			long* prev_ebp = *((long**)_ebp);
-			/*
-				considering first arg to be at prev_ebp+2xsizeof(long)
-				(not always the case. not really portable)
-			*/
-			switch (fn_details[i].argc)
-			{
-			case -1:
-			case 0:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name);
-				break;
-			case 1:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2));
-				break;
-			case 2:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3));
-				break;
-			case 3:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4));
-				break;
-			case 4:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5));
-				break;
-			case 5:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-					*(prev_ebp+6));
-				break;
-			case 6:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-					*(prev_ebp+6), *(prev_ebp+7));
-				break;
-			case 7:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-					*(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8));
-				break;
-			case 8:
-				ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-					*(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-					*(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8),
-					*(prev_ebp+9));
-				break;
-			default:
-				printf("A maximum of 8 arguments are supported in a trigger call\n");
-				ev = false;
-			}
-			if (!ev) {
-				break;
-			}
-		}
-		if (ev)
-		{
-			*return_error = 1;
-			*return_code = fn_details->return_value;
-			*return_errno = fn_details->errno_value;
-			*call_original = fn_details->call_original;
-			break;
-		}
-	}
+        if (!triggers[j]->trigger)
+        {
+          printf( "Trigger class %s not found or not yet registered while intercepting %s\n",
+                  triggers[j]->tclass, fn_details[i].function_name);
+          return;
+        }
+        else
+        {
+          if (triggers[j]->init[0])
+          {
+            initDataDoc = xmlParseDoc((xmlChar*)triggers[j]->init);
 
-	/* the writes should be serialized (between threads) to avoid corruption */
+            if (initDataDoc)
+              initData = xmlDocGetRootElement(initDataDoc);
+          } else {
+            initData = NULL;
+          }
+          triggers[j]->trigger->Init(initData);
+        }
+      }
 
-	if (*return_error)
-	{
+      register void* _ebp __asm__( REG_BP );
+      long* prev_ebp = *((long**)_ebp);
+      /*
+         considering first arg to be at prev_ebp+2xsizeof(long)
+         (not always the case. not really portable)
+         */
+      switch (fn_details[i].argc)
+      {
+      case -1:
+      case 0:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name);
+        break;
+      case 1:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2));
+        break;
+      case 2:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3));
+        break;
+      case 3:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4));
+        break;
+      case 4:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5));
+        break;
+      case 5:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
+                                        *(prev_ebp+6));
+        break;
+      case 6:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
+                                        *(prev_ebp+6), *(prev_ebp+7));
+        break;
+      case 7:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
+                                        *(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8));
+        break;
+      case 8:
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
+                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
+                                        *(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8),
+                                        *(prev_ebp+9));
+        break;
+      default:
+        printf("A maximum of 8 arguments are supported in a trigger call\n");
+        ev = false;
+      }
+      if (!ev) {
+        break;
+      }
+    }
+    if (ev)
+    {
+      *return_error = 1;
+      *return_code = fn_details->return_value;
+      *return_errno = fn_details->errno_value;
+      *call_original = fn_details->call_original;
+      break;
+    }
+  }
+
+  /* the writes should be serialized (between threads) to avoid corruption */
+
+  if (*return_error)
+  {
 #ifdef WITH_LOGS
-		struct timespec t = {0, 0};
-		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+    struct timespec t = {0, 0};
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
 
-		sprintf(message, "[ %s, %lld %ld %ld] Returning code %d; setting errno to %d\n", function_name, tsc(), (long)t.tv_sec, t.tv_nsec, *return_code, *return_errno);
-		write(log_fd, message, strlen(message));
-		fdatasync(log_fd);
+    sprintf(message, "[ %s, %lld %ld %ld] Returning code %d; setting errno to %d\n", function_name, tsc(), (long)t.tv_sec, t.tv_nsec, *return_code, *return_errno);
+    write(log_fd, message, strlen(message));
+    fdatasync(log_fd);
 
-		sprintf(message, "<function name=\"%s\" inject=\"%d\" retval=\"%d\" errno=\"%d\" calloriginal=\"0\" />\n", function_name, call_count, *return_code, *return_errno);
-		write(replay_fd, message, strlen(message));
+    sprintf(message, "<function name=\"%s\" inject=\"%d\" retval=\"%d\" errno=\"%d\" calloriginal=\"0\" />\n", function_name, call_count, *return_code, *return_errno);
+    write(replay_fd, message, strlen(message));
 #endif
-	}
-	
+  }
 }
