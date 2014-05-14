@@ -29,7 +29,7 @@ void PrintStackTrigger::Init(xmlNodePtr initData)
   }
 }
 
-bool PrintStackTrigger::Eval(const string&, ...)
+bool PrintStackTrigger::Eval(const string*, ...)
 {
   void *array[10];
     size_t size;

@@ -103,7 +103,7 @@ void *__libc_stack_end;
 extern void *__libc_stack_end;
 #endif
 
-bool StateTrigger::Eval(const string&, ...)
+bool StateTrigger::Eval(const string*, ...)
 {
   int i;
 #ifdef __APPLE__

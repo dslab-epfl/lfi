@@ -58,7 +58,7 @@ void TimerTrigger::Init(xmlNodePtr initData)
   }
 }
 
-bool TimerTrigger::Eval(const string&, ...)
+bool TimerTrigger::Eval(const string*, ...)
 {
   if (go)
     return true;

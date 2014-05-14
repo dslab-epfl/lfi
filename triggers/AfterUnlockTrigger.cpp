@@ -74,7 +74,7 @@ bool get_file_line(const char* binary, unsigned long address, char* src, int* li
 }
 
 
-bool AfterUnlockTrigger::Eval(const string& functionName, ...)
+bool AfterUnlockTrigger::Eval(const string* functionName, ...)
 {
   map<pthread_t, UnlockInfo>::iterator it;
   UnlockInfo ui;
@@ -90,7 +90,7 @@ bool AfterUnlockTrigger::Eval(const string& functionName, ...)
   // for mysql, go one more time to skip the wrappers
   ebp = ebp->ebp;
   
-  if (functionName == "pthread_exit")
+  if (*functionName == "pthread_exit")
   {
     it = lastUnlockInfo.find(self);
     if (it != lastUnlockInfo.end())
@@ -100,7 +100,7 @@ bool AfterUnlockTrigger::Eval(const string& functionName, ...)
   else if (get_file_line(exePath.c_str(), (unsigned long)ebp->ret, ui.file, &ui.line)) {
     self = pthread_self();
 
-    if (functionName == "pthread_mutex_unlock")
+    if (*functionName == "pthread_mutex_unlock")
     {
       lastUnlockInfo[self] = ui;
     }

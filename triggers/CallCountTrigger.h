@@ -31,7 +31,7 @@ DEFINE_TRIGGER( CallCountTrigger )
 public:
   CallCountTrigger();
   void Init(xmlNodePtr initData);
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 private:
   int callCount;
   vector<int> callCounts;

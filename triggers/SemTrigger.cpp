@@ -62,16 +62,16 @@ void SemTrigger::set_lockCount(long v)
 }
 
 
-bool SemTrigger::Eval(const string& functionName, ...)
+bool SemTrigger::Eval(const string* functionName, ...)
 {
   long l;
-  if (functionName == "pthread_mutex_lock")
+  if (*functionName == "pthread_mutex_lock")
   {
     set_lockCount(get_lockCount()+1);
   }
-  else if (functionName == "pthread_mutex_unlock")
+  else if (*functionName == "pthread_mutex_unlock")
   {
-    if (l = get_lockCount()) // sanity check
+    if ((l = get_lockCount())) // sanity check
       set_lockCount(l - 1);
   }
   else

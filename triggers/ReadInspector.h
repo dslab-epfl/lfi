@@ -30,5 +30,5 @@ DEFINE_TRIGGER( ReadInspector )
 {
 public:
   ReadInspector();
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 };

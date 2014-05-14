@@ -31,7 +31,7 @@ DEFINE_TRIGGER( RandomTrigger )
 public:
   RandomTrigger();
   void Init(xmlNodePtr initData);
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 private:
   int probability;
   static unsigned int seed;

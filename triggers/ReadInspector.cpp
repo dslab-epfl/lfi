@@ -32,7 +32,7 @@ ReadInspector::ReadInspector()
 {
 }
 
-bool ReadInspector::Eval(const string& functionName, ...)
+bool ReadInspector::Eval(const string* functionName, ...)
 {
   /* only intended to be used when intercepting the read function */
   va_list ap;

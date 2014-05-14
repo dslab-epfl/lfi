@@ -36,7 +36,7 @@ class Trigger
 {
 public:
   virtual void Init(xmlNodePtr initData) {}
-  virtual bool Eval(const string& functionName, ...) = 0;
+  virtual bool Eval(const string* functionName, ...) = 0;
 };
 
 typedef Trigger* (*FactoryMethod)() ;

@@ -31,7 +31,7 @@ DEFINE_TRIGGER( SemTrigger )
 {
 public:
   SemTrigger();
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 private:
   long get_lockCount();
   void set_lockCount(long);

@@ -30,7 +30,7 @@ DEFINE_TRIGGER( SingleTrigger )
 {
 public:
   SingleTrigger();
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 private:
   unsigned int triggered;
 };

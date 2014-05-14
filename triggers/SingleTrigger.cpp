@@ -32,7 +32,7 @@ SingleTrigger::SingleTrigger()
   triggered = 0;
 }
 
-bool SingleTrigger::Eval(const string&, ...)
+bool SingleTrigger::Eval(const string*, ...)
 {
   if (triggered) {
     return false;

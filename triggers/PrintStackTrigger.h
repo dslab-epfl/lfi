@@ -6,7 +6,7 @@ DEFINE_TRIGGER( PrintStackTrigger )
 public:
   PrintStackTrigger();
   void Init(xmlNodePtr initData);
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 private:
   FILE* file;
 };

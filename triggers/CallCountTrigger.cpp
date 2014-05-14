@@ -50,7 +50,7 @@ void CallCountTrigger::Init(xmlNodePtr initData)
   }
 }
 
-bool CallCountTrigger::Eval(const string&, ...)
+bool CallCountTrigger::Eval(const string*, ...)
 {
   ++callCount;
   // binary search? not useful for a reasonably small number of call counts

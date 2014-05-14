@@ -264,35 +264,31 @@ void determine_action(struct fninfov2 fn_details[],
         arg1 = *(prev_ebp+2);
       }
 #endif
-
+      /* consider using a char* */
+      const string fn = fn_details[i].function_name;
       switch (fn_details[i].argc)
       {
       case -1:
       case 0:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name);
+        ev = triggers[j]->trigger->Eval(&fn);
         break;
       case 1:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1);
+        ev = triggers[j]->trigger->Eval(&fn, arg1);
         break;
       case 2:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
-                                        arg2);
+        ev = triggers[j]->trigger->Eval(&fn, arg1, arg2);
         break;
       case 3:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg3,
-                                        arg2, arg3);
+        ev = triggers[j]->trigger->Eval(&fn, arg1, arg2, arg3);
         break;
       case 4:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
-                                        arg2, arg3, arg4);
+        ev = triggers[j]->trigger->Eval(&fn, arg1, arg2, arg3, arg4);
         break;
       case 5:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
-                                        arg2, arg3, arg4, arg5);
+        ev = triggers[j]->trigger->Eval(&fn, arg1, arg2, arg3, arg4, arg5);
         break;
       case 6:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
-                                        arg2, arg3, arg4, arg5, arg6);
+        ev = triggers[j]->trigger->Eval(&fn, arg1, arg2, arg3, arg4, arg5, arg6);
         break;
       default:
         printf("A maximum of 6 arguments are supported in a trigger call\n");

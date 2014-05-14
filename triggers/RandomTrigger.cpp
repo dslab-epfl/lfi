@@ -63,7 +63,7 @@ void RandomTrigger::Init(xmlNodePtr initData)
   }
 }
 
-bool RandomTrigger::Eval(const string& fn, ...)
+bool RandomTrigger::Eval(const string*, ...)
 {
   if (rand() % 100 < probability)
     return true;

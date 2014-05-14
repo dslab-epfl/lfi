@@ -15,7 +15,7 @@ public:
 public:
   AfterUnlockTrigger();
   void Init(xmlNodePtr initData);
-  bool Eval(const string& functionName, ...);
+  bool Eval(const string* functionName, ...);
 
 private:
   int lineCount;
