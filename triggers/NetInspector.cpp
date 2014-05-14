@@ -2,8 +2,9 @@
 #include <iostream>
 #include <stdarg.h>
 #include <string.h>
+#include <unistd.h>
 
-#define serverHostname  "radu-virtUbuntu9045"
+#define serverHostname  "myServerName"
 #define serverPort   11111
 
 NetInspector::NetInspector()

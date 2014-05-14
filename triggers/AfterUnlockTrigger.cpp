@@ -1,6 +1,7 @@
 
 #include "AfterUnlockTrigger.h"
 #include <fstream>
+#include <unistd.h>
 #include <stdarg.h>
 #include <execinfo.h>
 #include <string.h>
