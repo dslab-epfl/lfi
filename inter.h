@@ -117,6 +117,12 @@ extern "C" {
 
 void determine_action(struct fninfov2 fn_details[],
             __in const char* function_name,
+            __in void* arg1,
+            __in void* arg2,
+            __in void* arg3,
+            __in void* arg4,
+            __in void* arg5,
+            __in void* arg6,
             __out int* call_original,
             __out int *return_error,
             __out int* return_code,
@@ -149,7 +155,9 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
   initial_no_intercept = get_no_intercept(); \
   if (0 == initial_no_intercept && init_done /* don't hook open or write in the constructor */) { \
     set_no_intercept(1); /* allow all determine_action-called functions to pass-through */ \
-    determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, &call_original, &return_error, &return_code, &return_errno); \
+    determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, \
+                     0, 0, 0, 0, 0, 0, \
+                     &call_original, &return_error, &return_code, &return_errno); \
   } \
   \
   if(!original_fn_ptr) { \
@@ -159,27 +167,7 @@ void print_backtrace(void* bt[], int nptrs, int log_fd);
   } \
   \
   set_no_intercept(initial_no_intercept); \
-  /* disabled - unlikely to be useful in practice  \
-  if (0 && call_original && return_error) \
-  { \
-    /* save the original return value */ \
-    __asm__ ("movl 0x4(%%ebp), %%eax;" : "=a"(return_address)); \
-    \
-    __asm__ ("leave"); \
-    __asm__ ("addl $0x4, %esp"); \
-    /* at this point the stack is gone */ \
-    \
-    /* make the call the original function with the same stack */ \
-    __asm__ ("call *%%eax;" : : "a"(original_fn_ptr)); \
-    \
-    errno = return_errno; \
-    \
-    /* push back the original return value */ \
-    __asm__ ("pushl %%eax;" : : "a"(return_address)); \
-    \
-    __asm__ ("ret" : : "a"(return_code)); \
-  } \
-  else */ if (return_error) \
+  if (return_error) \
   { \
     errno = return_errno; \
     __asm__ ("" : : "a"(return_code)); \
@@ -241,31 +229,19 @@ struct reg_backup {
   static int * (*original_write_ptr)(int, const void*, int); \
   int initial_no_intercept; \
   \
-  register void *_r15 __asm__ ( "r15" ); \
-  register void *_r14 __asm__ ( "r14" ); \
-  register void *_r13 __asm__ ( "r13" ); \
-  register void *_r12 __asm__ ( "r12" ); \
-  register void *_rdi __asm__ ( "rdi" ); \
-  register void *_rsi __asm__ ( "rsi" ); \
-  register void *_rbx __asm__ ( "rbx" ); \
-  register void *_rcx __asm__ ( "rcx" ); \
-  register void *_rdx __asm__ ( "rdx" ); \
-  register void *_r8 __asm__ ( "r8" ); \
-  register void *_r9 __asm__ ( "r9" ); \
-  \
   /* save non-volatiles */ \
-  regs.r15 = _r15; \
-  regs.r14 = _r14; \
-  regs.r13 = _r13; \
-  regs.r12 = _r12; \
-  regs.rbx = _rbx; \
-  /* save function arguments */ \
-  regs.rdi = _rdi; \
-  regs.rsi = _rsi; \
-  regs.rcx = _rcx; \
-  regs.rdx = _rdx; \
-  regs.r8 = _r8; \
-  regs.r9 = _r9; \
+  __asm__ __volatile__ ("movq %%r9, %0"  : "=m"(regs.r9) :); \
+  __asm__ __volatile__ ("movq %%r8, %0"  : "=m"(regs.r8) :); \
+  __asm__ __volatile__ ("movq %%rdx, %0" : "=m"(regs.rdx) :); \
+  __asm__ __volatile__ ("movq %%rcx, %0" : "=m"(regs.rcx) :); \
+  /* restore non-volatiles */ \
+  __asm__ __volatile__ ("movq %%rbx, %0" : "=m"(regs.rbx) :); \
+  __asm__ __volatile__ ("movq %%rsi, %0" : "=m"(regs.rsi) :); \
+  __asm__ __volatile__ ("movq %%rdi, %0" : "=m"(regs.rdi) :); \
+  __asm__ __volatile__ ("movq %%r12, %0" : "=m"(regs.r12) :); \
+  __asm__ __volatile__ ("movq %%r13, %0" : "=m"(regs.r13) :); \
+  __asm__ __volatile__ ("movq %%r14, %0" : "=m"(regs.r14) :); \
+  __asm__ __volatile__ ("movq %%r15, %0" : "=m"(regs.r15) :); \
   \
   /* defaults */ \
   call_original = 1; \
@@ -279,7 +255,9 @@ struct reg_backup {
     initial_no_intercept = get_no_intercept(); \
     if (0 == initial_no_intercept) { \
       set_no_intercept(1); \
-      determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, &call_original, &return_error, &return_code, &return_errno); \
+      determine_action(function_info_ ## FUNCTION_NAME, #FUNCTION_NAME, \
+                       regs.rdi, regs.rsi, regs.rcx, regs.rdx, regs.r8, regs.r9, \
+                       &call_original, &return_error, &return_code, &return_errno); \
     } \
   } \
         \

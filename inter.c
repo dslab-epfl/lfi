@@ -171,6 +171,12 @@ void set_no_intercept(long value)
 /************************************************************************/
 void determine_action(struct fninfov2 fn_details[],
               __in const char* function_name,
+              __in void* arg1,
+              __in void* arg2,
+              __in void* arg3,
+              __in void* arg4,
+              __in void* arg5,
+              __in void* arg6,
               __out int* call_original,
               __out int* return_error,
               __out int* return_code,
@@ -233,12 +239,32 @@ void determine_action(struct fninfov2 fn_details[],
         }
       }
 
-      register void* _ebp __asm__( REG_BP );
-      long* prev_ebp = *((long**)_ebp);
+#if defined(__i386)
       /*
          considering first arg to be at prev_ebp+2xsizeof(long)
          (not always the case. not really portable)
-         */
+      */
+      void* _ebp;
+       __asm__ __volatile__ ("movl %%ebp, %0"  : "=m"(_ebp) : );
+
+      long* prev_ebp = *((long**)_ebp);
+      switch(fn_details[i].argc)
+      {
+      case 6:
+        arg6 = *(prev_ebp+7);
+      case 5:
+        arg5 = *(prev_ebp+6);
+      case 4:
+        arg4 = *(prev_ebp+5);
+      case 3:
+        arg3 = *(prev_ebp+4);
+      case 2:
+        arg2 = *(prev_ebp+3);
+      case 1:
+        arg1 = *(prev_ebp+2);
+      }
+#endif
+
       switch (fn_details[i].argc)
       {
       case -1:
@@ -246,43 +272,30 @@ void determine_action(struct fninfov2 fn_details[],
         ev = triggers[j]->trigger->Eval(fn_details[i].function_name);
         break;
       case 1:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1);
         break;
       case 2:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
+                                        arg2);
         break;
       case 3:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg3,
+                                        arg2, arg3);
         break;
       case 4:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
+                                        arg2, arg3, arg4);
         break;
       case 5:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-                                        *(prev_ebp+6));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
+                                        arg2, arg3, arg4, arg5);
         break;
       case 6:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-                                        *(prev_ebp+6), *(prev_ebp+7));
-        break;
-      case 7:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-                                        *(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8));
-        break;
-      case 8:
-        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, *(prev_ebp+2),
-                                        *(prev_ebp+3), *(prev_ebp+4), *(prev_ebp+5),
-                                        *(prev_ebp+6), *(prev_ebp+7), *(prev_ebp+8),
-                                        *(prev_ebp+9));
+        ev = triggers[j]->trigger->Eval(fn_details[i].function_name, arg1,
+                                        arg2, arg3, arg4, arg5, arg6);
         break;
       default:
-        printf("A maximum of 8 arguments are supported in a trigger call\n");
+        printf("A maximum of 6 arguments are supported in a trigger call\n");
         ev = false;
       }
       if (!ev) {
