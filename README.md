@@ -12,7 +12,6 @@ Installation
 ###Dependencies
 * gcc/clang
 * libxml-dev (or libxml-devel)
-* [optional] libelf-dev and libdwarf
 
 ###Operating system
 LFI was tested on 64-bit MacOS and Linux systems. It *should* also work on their 32-bit counterparts.
@@ -118,4 +117,4 @@ What is seen here is a fault that interferes with the PostgreSQL's client abilit
 
 If you're wondering why the fault occurs on the 2nd call, it's because psql makes one call to <tt>recv()</tt> during startup; if you add that in, you will see that it is the 3rd time we use <tt>recv()</tt> that the fault is observed.
 
-For further details about LFI, the available triggers and how to write your own, see the [documentation](https://github.com/dslab-epfl/lfi/wiki).
+For further information about LFI, the available triggers and how to write your own, see the [documentation](https://github.com/dslab-epfl/lfi/wiki/User-Manual). Also see the [executive summary and publication list](https://github.com/dslab-epfl/lfi/wiki).
