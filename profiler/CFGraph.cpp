@@ -26,6 +26,7 @@
 
 #include "CFGraph.h"
 #include <iostream>
+#include <cstring>
 
 CFGraph::CFGraph(void)
 {

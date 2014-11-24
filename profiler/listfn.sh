@@ -43,11 +43,11 @@ fi
 if [[ x$2 == x ]]; then
 	TARGETFN="FUNC"
 else
-	TARGETFN=" $2$"
+	TARGETFN="$2"
 fi
 
 readelf -s --wide $1 | grep FUNC > exports.tmp
-FUNCTIONS=`cat exports.tmp |grep "$TARGETFN" | grep -v UND | awk '{ print $8 }'| grep -v '^_'`
+FUNCTIONS=`cat exports.tmp |grep "$TARGETFN" | grep -v UND | awk '{ print $8 }'| grep -v '^_' | sed 's/@@.*//g'`
 
 echo "<profile>"
 for function in $FUNCTIONS
