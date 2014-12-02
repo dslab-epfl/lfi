@@ -29,6 +29,8 @@
 #include <queue>
 #include <string>
 #include <assert.h>
+#include <cstdlib>
+#include <cstring>
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -49,21 +49,18 @@ FUNCTIONS=`cat exports.tmp |grep "$TARGETFN" | grep -v UND | awk '{ print $8 }'`
 for function in $FUNCTIONS
 do
 
-GARG=" $function$"
+GARG="$function"
 
 STARTOFFSET=0x`cat exports.tmp | grep -v '^_' | grep "$GARG" | awk '{ print $2 }' | head -1`
 
 CHCNT=`echo $STARTOFFSET|wc -m`
 
-
-if [ "$CHCNT" = "11" ]; then
 cleanfunction=`echo $function|sed 's/@@.*//g'`
 
 STOPOFFSET=`cat exports_sort.tmp | awk ' { if ( ( $0 ) > ("'$STARTOFFSET'") ) { print $0 ; exit } }'`
 objdump -d -M intel --start-address=$STARTOFFSET --stop-address=$STOPOFFSET $1 | egrep -v "(^Disassembly|^/|^$)" > "disassembly/$cleanfunction"
 
 echo $function $STARTOFFSET $STOPOFFSET
-fi
 
 done
 

@@ -29,6 +29,8 @@
 #include <string>
 #include <queue>
 #include <set>
+#include <cstring>
+#include <cstdlib>
 
 #include "CFGBuilder.h"
 #include "CFGBuilderSPARC.h"

@@ -30,6 +30,9 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace std;
 
